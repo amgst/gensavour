@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import AdminDashboard from './components/AdminDashboard';
 import AdminLogin from './components/AdminLogin';
@@ -12,7 +12,7 @@ import { INITIAL_MENU, SITE_INFO } from './constants';
 const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
   const [activeTab, setActiveTab] = useState<Category>(Category.ENTREES);
   const popularItems = menu.filter(item => item.isPopular).slice(0, 3);
-  
+
   // Filter menu items for the highlights section (limit to 4 per category for home page)
   const highlightItems = menu.filter(item => item.category === activeTab).slice(0, 4);
 
@@ -30,15 +30,15 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
       {/* Hero Section */}
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1541544741938-0af808871cc0?q=80&w=2069&auto=format&fit=crop" 
-            alt="Intelligence-Driven Cuisine" 
+          <img
+            src="https://images.unsplash.com/photo-1541544741938-0af808871cc0?q=80&w=2069&auto=format&fit=crop"
+            alt="Intelligence-Driven Cuisine"
             className="w-full h-full object-cover brightness-50 scale-105 animate-pulse-slow"
           />
         </div>
         <div className="relative z-10 text-center px-4">
           <h1 className="text-5xl md:text-8xl text-white font-bold mb-6 tracking-tight animate-fadeIn">
-            Pure Digital <br/> <span className="text-amber-400 italic font-serif">Hospitality</span>
+            Pure Digital <br /> <span className="text-amber-400 italic font-serif">Hospitality</span>
           </h1>
           <p className="text-base md:text-2xl text-stone-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed animate-slideUp">
             Discover a mosaic of flavors refined by intelligence. Handcrafted with traditional essence and future-forward precision.
@@ -88,9 +88,9 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
             {popularItems.map(item => (
               <div key={item.id} className="group cursor-pointer">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-2xl mb-6 shadow-lg">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
+                  <img
+                    src={item.image}
+                    alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute top-4 left-4 bg-amber-400 text-stone-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">
@@ -112,17 +112,16 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
           <div className="text-center mb-16">
             <span className="text-amber-400 font-bold uppercase tracking-[0.3em] text-xs mb-4 block">The Neural Palette</span>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 font-serif">Menu Highlights</h2>
-            
+
             <div className="flex overflow-x-auto pb-4 md:pb-0 md:flex-wrap justify-start md:justify-center gap-3 md:gap-4 mt-8 no-scrollbar">
               {[Category.APPETIZERS, Category.ENTREES, Category.DESSERTS].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveTab(cat)}
-                  className={`px-5 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all border whitespace-nowrap ${
-                    activeTab === cat
-                      ? 'bg-amber-400 border-amber-400 text-stone-900'
-                      : 'border-white/20 text-white hover:border-white/40'
-                  }`}
+                  className={`px-5 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all border whitespace-nowrap ${activeTab === cat
+                    ? 'bg-amber-400 border-amber-400 text-stone-900'
+                    : 'border-white/20 text-white hover:border-white/40'
+                    }`}
                 >
                   {cat}
                 </button>
@@ -164,14 +163,14 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
               Every detail is a data point of flavor.
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[250px] md:auto-rows-[300px]">
             {galleryItems.map((item, i) => (
               <div key={i} className={`relative overflow-hidden group rounded-[2rem] md:rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-700 ${item.span}`}>
-                <img 
-                  src={item.url} 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-                  alt={item.title} 
+                <img
+                  src={item.url}
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                  alt={item.title}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6 md:p-8">
                   <span className="text-amber-400 text-[8px] md:text-[10px] font-bold uppercase tracking-[0.4em] mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">GenSavor Collection</span>
@@ -290,11 +289,10 @@ const MenuPage: React.FC<MenuPageProps> = ({ menu, onAddToCart, cart }) => {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-6 py-2 md:py-3 rounded-full text-xs md:text-sm font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeCategory === cat 
-                  ? 'bg-emerald-800 text-white shadow-lg' 
-                  : 'bg-white text-stone-500 hover:bg-stone-100'
-              }`}
+              className={`px-6 py-2 md:py-3 rounded-full text-xs md:text-sm font-bold uppercase tracking-widest transition-all whitespace-nowrap ${activeCategory === cat
+                ? 'bg-emerald-800 text-white shadow-lg'
+                : 'bg-white text-stone-500 hover:bg-stone-100'
+                }`}
             >
               {cat}
             </button>
@@ -319,8 +317,8 @@ const MenuPage: React.FC<MenuPageProps> = ({ menu, onAddToCart, cart }) => {
                     <span className="text-lg md:text-xl font-serif text-emerald-800 font-bold ml-auto">${item.price.toFixed(2)}</span>
                   </div>
                   <p className="text-stone-500 text-xs md:text-sm leading-relaxed mb-4">{item.description}</p>
-                  
-                  <button 
+
+                  <button
                     onClick={() => onAddToCart(item)}
                     className="flex items-center justify-center sm:justify-start gap-2 text-xs md:text-sm font-bold text-emerald-800 hover:text-emerald-950 transition-all bg-emerald-50 px-4 py-2 rounded-full w-full sm:w-auto"
                   >
@@ -357,7 +355,7 @@ const ContactPage: React.FC = () => {
             <p className="text-stone-600 text-base md:text-lg mb-12">
               For reservations, catering inquiries, or feedback, please reach out to us. Our system is ready to assist.
             </p>
-            
+
             <div className="space-y-8">
               <div className="flex gap-6 items-start">
                 <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-800 shrink-0">📍</div>
@@ -412,7 +410,7 @@ const App: React.FC = () => {
     const savedMenu = localStorage.getItem('gensavor_menu');
     const savedCart = sessionStorage.getItem('gensavor_cart');
     const authStatus = sessionStorage.getItem('gensavor_admin_auth');
-    
+
     if (savedMenu) {
       setMenu(JSON.parse(savedMenu));
     } else {
@@ -476,18 +474,18 @@ const App: React.FC = () => {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/checkout" element={<OrderCheckout cart={cart} onClearCart={handleClearCart} onUpdateQuantity={handleUpdateQuantity} />} />
           <Route path="/about" element={<div className="py-24 max-w-4xl mx-auto px-4"><h1 className="text-4xl md:text-5xl font-bold mb-8 font-serif text-center md:text-left">Our Evolution</h1><p className="text-stone-600 text-base md:text-lg leading-relaxed text-center md:text-left">Welcome to GenSavor. Our journey began with a simple vision: to bring the authentic hospitality of our heritage into the modern age. We treat every guest as a data point in our story of excellence. Our kitchen is where tradition meets artificial intelligence, creating a sanctuary for those who appreciate the finer details of high-tech dining.</p></div>} />
-          
-          <Route 
-            path="/admin/login" 
-            element={isAdminLoggedIn ? <Navigate to="/admin" /> : <AdminLogin onLogin={handleLogin} />} 
+
+          <Route
+            path="/admin/login"
+            element={isAdminLoggedIn ? <Navigate to="/admin" /> : <AdminLogin onLogin={handleLogin} />}
           />
-          <Route 
-            path="/admin" 
-            element={isAdminLoggedIn ? <AdminHome menu={menu} onNavigateToMenu={() => window.location.hash = '#/admin/menu'} /> : <Navigate to="/admin/login" />} 
+          <Route
+            path="/admin"
+            element={isAdminLoggedIn ? <AdminHome menu={menu} /> : <Navigate to="/admin/login" />}
           />
-          <Route 
-            path="/admin/menu" 
-            element={isAdminLoggedIn ? <AdminDashboard menuItems={menu} onUpdateMenu={handleUpdateMenu} /> : <Navigate to="/admin/login" />} 
+          <Route
+            path="/admin/menu"
+            element={isAdminLoggedIn ? <AdminDashboard menuItems={menu} onUpdateMenu={handleUpdateMenu} /> : <Navigate to="/admin/login" />}
           />
         </Routes>
       </Layout>

@@ -1,13 +1,14 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MenuItem, Category } from '../types';
 
 interface AdminHomeProps {
   menu: MenuItem[];
-  onNavigateToMenu: () => void;
 }
 
-const AdminHome: React.FC<AdminHomeProps> = ({ menu, onNavigateToMenu }) => {
+const AdminHome: React.FC<AdminHomeProps> = ({ menu }) => {
+  const navigate = useNavigate();
   const stats = {
     total: menu.length,
     popular: menu.filter(m => m.isPopular).length,
@@ -29,7 +30,7 @@ const AdminHome: React.FC<AdminHomeProps> = ({ menu, onNavigateToMenu }) => {
             <div className="bg-emerald-500 h-full" style={{ width: '70%' }}></div>
           </div>
         </div>
-        
+
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100">
           <p className="text-stone-500 uppercase tracking-widest text-xs font-bold mb-2">Featured Items</p>
           <p className="text-5xl font-bold text-amber-500">{stats.popular}</p>
@@ -53,8 +54,8 @@ const AdminHome: React.FC<AdminHomeProps> = ({ menu, onNavigateToMenu }) => {
           <p className="text-emerald-100 text-lg mb-8 leading-relaxed">
             Add new seasonal specials, adjust prices, or use Gemini AI to write compelling descriptions that will delight your customers.
           </p>
-          <button 
-            onClick={onNavigateToMenu}
+          <button
+            onClick={() => navigate('/admin/menu')}
             className="bg-amber-400 text-emerald-950 font-bold px-8 py-4 rounded-xl hover:bg-amber-300 transition-all shadow-lg"
           >
             Manage Menu Content
