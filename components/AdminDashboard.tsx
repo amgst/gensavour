@@ -16,7 +16,7 @@ interface ValidationErrors {
 
 interface AdminDashboardProps {
   menuItems: MenuItem[];
-  onUpdateMenu: (updatedMenu: MenuItem[]) => void;
+  onUpdateMenu: (menu: MenuItem[]) => Promise<void>;
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu }) => {
@@ -26,10 +26,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Selection State
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  
+
   // Filtering & Sorting State
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('All');
@@ -54,10 +54,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
 
   const handleInputChange = (field: keyof MenuItem, value: any) => {
     if (!editingItem) return;
-    
+
     const newItem = { ...editingItem, [field]: value };
     setEditingItem(newItem);
-    
+
     // Real-time validation
     const error = validateField(field, value);
     setErrors(prev => ({ ...prev, [field]: error }));
@@ -73,10 +73,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
     setTouched({});
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this dish from the menu?')) {
-      const updated = menuItems.filter(item => item.id !== id);
-      onUpdateMenu(updated);
+  const handleDeleteItem = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this item?')) {
+      const updatedMenu = menuItems.filter(item => item.id !== id);
+      await onUpdateMenu(updatedMenu);
       setSelectedIds(prev => {
         const next = new Set(prev);
         next.delete(id);
@@ -95,7 +95,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
         alert("File is too large. Please select an image under 2MB.");
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         handleInputChange('image', reader.result as string);
@@ -104,7 +104,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
 
@@ -132,8 +132,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
       } as MenuItem;
       updatedMenu = [...menuItems, newItem];
     }
-    
-    onUpdateMenu(updatedMenu);
+
+    await onUpdateMenu(updatedMenu);
     setEditingItem(null);
   };
 
@@ -176,7 +176,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
   // Intermediate state for counts: items that match the current search term
   const searchMatchedItems = useMemo(() => {
     if (!searchTerm) return menuItems;
-    return menuItems.filter(item => 
+    return menuItems.filter(item =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [menuItems, searchTerm]);
@@ -192,7 +192,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
 
   const displayItems = useMemo(() => {
     let items = [...searchMatchedItems];
-    
+
     // Filter by Category
     if (filterCategory !== 'All') {
       items = items.filter(item => item.category === filterCategory);
@@ -242,14 +242,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
   };
 
   const handleBulkMarkPopular = (status: boolean) => {
-    const updated = menuItems.map(item => 
+    const updated = menuItems.map(item =>
       selectedIds.has(item.id) ? { ...item, isPopular: status } : item
     );
     onUpdateMenu(updated);
   };
 
   const handleBulkChangeCategory = (cat: Category) => {
-    const updated = menuItems.map(item => 
+    const updated = menuItems.map(item =>
       selectedIds.has(item.id) ? { ...item, category: cat } : item
     );
     onUpdateMenu(updated);
@@ -268,7 +268,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
           <h1 className="text-4xl font-bold text-stone-800 font-serif">Menu Management</h1>
           <p className="text-stone-500 text-sm mt-1">Refine your offerings and update visuals.</p>
         </div>
-        <button 
+        <button
           onClick={() => {
             setEditingItem({ category: Category.ENTREES, price: 0 });
             setErrors({});
@@ -289,7 +289,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </span>
-            <input 
+            <input
               type="text"
               placeholder="Search dishes..."
               value={searchTerm}
@@ -302,7 +302,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <label className="text-sm font-semibold text-stone-600 uppercase tracking-wider whitespace-nowrap">Viewing:</label>
-            <select 
+            <select
               value={filterCategory}
               onChange={(e) => {
                 setFilterCategory(e.target.value);
@@ -328,7 +328,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
       {editingItem && (
         <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto border border-stone-200 animate-slideUp">
-            <button 
+            <button
               onClick={() => setEditingItem(null)}
               className="absolute top-6 right-6 text-stone-400 hover:text-stone-600 p-2 transition-colors"
             >
@@ -339,12 +339,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
             <h2 className="text-3xl font-bold mb-8 font-serif text-emerald-900">
               {editingItem.id ? 'Modify Dish' : 'Add New Dish'}
             </h2>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-1">Dish Name</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={editingItem.name || ''}
@@ -357,7 +357,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                 </div>
                 <div className="space-y-1">
                   <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-1">Category</label>
-                  <select 
+                  <select
                     value={editingItem.category}
                     onChange={e => handleInputChange('category', e.target.value as Category)}
                     className="w-full border border-stone-200 bg-stone-50 rounded-xl px-4 py-3 focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-200 shadow-sm cursor-pointer"
@@ -372,7 +372,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
               <div className="space-y-1">
                 <div className="flex justify-between items-end mb-1">
                   <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest">Description</label>
-                  <button 
+                  <button
                     type="button"
                     onClick={handleAIDescription}
                     disabled={isLoadingAI}
@@ -381,7 +381,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                     {isLoadingAI ? '...' : '✨ Gemini AI'}
                   </button>
                 </div>
-                <textarea 
+                <textarea
                   required
                   rows={3}
                   value={editingItem.description || ''}
@@ -397,7 +397,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                 <div className="space-y-1">
                   <div className="flex justify-between items-end mb-1">
                     <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest">Price ($)</label>
-                    <button 
+                    <button
                       type="button"
                       onClick={handleAISuggestPrice}
                       disabled={isLoadingAI}
@@ -406,7 +406,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                       AI Suggest
                     </button>
                   </div>
-                  <input 
+                  <input
                     type="number"
                     step="0.01"
                     required
@@ -429,7 +429,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                     </div>
                     <div className="flex-grow flex gap-2">
                       <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
-                      <button 
+                      <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         className="flex-grow py-2 bg-stone-100 border border-stone-200 rounded-lg text-[10px] font-bold uppercase tracking-wider text-stone-600 hover:bg-stone-200 transition-colors"
@@ -445,7 +445,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
               </div>
 
               <div className="flex items-center gap-3 p-4 bg-stone-50 rounded-xl border border-stone-100">
-                <input 
+                <input
                   type="checkbox"
                   id="isPopular"
                   checked={editingItem.isPopular || false}
@@ -457,8 +457,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
 
               <div className="flex justify-end gap-4 pt-6 border-t border-stone-100">
                 <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 text-stone-500 font-bold uppercase text-xs tracking-widest hover:text-stone-800 transition-colors">Cancel</button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={Object.values(errors).some(e => !!e)}
                   className="px-8 py-3 bg-emerald-800 text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-lg shadow-emerald-900/10 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
@@ -476,35 +476,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
           <div className="flex items-center gap-4">
             <span className="bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold">{selectedIds.size}</span>
             <span className="text-xs font-bold uppercase tracking-widest">Selected</span>
-            <button 
+            <button
               onClick={() => setSelectedIds(new Set())}
               className="text-[10px] text-stone-400 hover:text-white uppercase tracking-wider font-bold"
             >
               Clear
             </button>
           </div>
-          
+
           <div className="flex items-center gap-4 border-l border-white/10 pl-8">
             <div className="flex gap-2">
-              <button 
+              <button
                 onClick={() => handleBulkMarkPopular(true)}
                 className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-emerald-800/50 border border-emerald-500/30 rounded-lg hover:bg-emerald-800 transition-colors"
               >
                 Featured
               </button>
-              <button 
+              <button
                 onClick={() => handleBulkMarkPopular(false)}
                 className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-stone-800 border border-stone-700 rounded-lg hover:bg-stone-700 transition-colors"
               >
                 Standard
               </button>
             </div>
-            
+
             <div className="h-4 w-px bg-white/10 mx-2"></div>
-            
+
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Move to:</span>
-              <select 
+              <select
                 onChange={(e) => {
                   if (e.target.value) {
                     handleBulkChangeCategory(e.target.value as Category);
@@ -530,26 +530,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
                 <th className="px-6 py-5 w-12">
-                   <input 
+                  <input
                     type="checkbox"
                     checked={isAllPaginatedSelected}
                     onChange={toggleSelectAll}
                     className="w-5 h-5 text-emerald-600 border-stone-300 rounded cursor-pointer accent-emerald-600"
                   />
                 </th>
-                <th 
+                <th
                   className="px-6 py-5 font-bold text-stone-600 cursor-pointer hover:text-emerald-800 transition-colors text-[10px] uppercase tracking-[0.2em]"
                   onClick={() => requestSort('name')}
                 >
                   Dish {getSortIndicator('name')}
                 </th>
-                <th 
+                <th
                   className="px-6 py-5 font-bold text-stone-600 cursor-pointer hover:text-emerald-800 transition-colors text-[10px] uppercase tracking-[0.2em]"
                   onClick={() => requestSort('category')}
                 >
                   Category {getSortIndicator('category')}
                 </th>
-                <th 
+                <th
                   className="px-6 py-5 font-bold text-stone-600 cursor-pointer hover:text-emerald-800 transition-colors text-[10px] uppercase tracking-[0.2em]"
                   onClick={() => requestSort('price')}
                 >
@@ -562,7 +562,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
               {paginatedItems.map(item => (
                 <tr key={item.id} className={`hover:bg-stone-50/50 transition-colors group ${selectedIds.has(item.id) ? 'bg-emerald-50/30' : ''}`}>
                   <td className="px-6 py-4">
-                    <input 
+                    <input
                       type="checkbox"
                       checked={selectedIds.has(item.id)}
                       onChange={() => toggleSelectItem(item.id)}
@@ -571,9 +571,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
-                      <img 
-                        src={item.image || 'https://via.placeholder.com/150'} 
-                        alt="" 
+                      <img
+                        src={item.image || 'https://via.placeholder.com/150'}
+                        alt=""
                         className="w-12 h-12 rounded-lg object-cover bg-stone-100 border border-stone-200"
                       />
                       <div className="min-w-0">
@@ -593,14 +593,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                   <td className="px-6 py-4 font-bold text-emerald-800 font-serif">${item.price.toFixed(2)}</td>
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleEdit(item)} className="text-emerald-700 hover:text-emerald-900 mr-4 font-bold text-[10px] uppercase tracking-widest">Edit</button>
-                    <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700 font-bold text-[10px] uppercase tracking-widest">Delete</button>
+                    <button onClick={() => handleDeleteItem(item.id)} className="text-red-500 hover:text-red-700 font-bold text-[10px] uppercase tracking-widest">Delete</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        
+
         {displayItems.length === 0 && (
           <div className="py-24 text-center text-stone-400 italic bg-stone-50/30">
             {searchTerm ? `No dishes matching "${searchTerm}" found.` : "No dishes found in this category."}
@@ -610,7 +610,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="px-6 py-4 bg-stone-50 border-t border-stone-200 flex items-center justify-between">
-            <button 
+            <button
               disabled={currentPage === 1}
               onClick={() => goToPage(currentPage - 1)}
               className="px-4 py-2 border border-stone-200 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
@@ -628,7 +628,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                 </button>
               ))}
             </div>
-            <button 
+            <button
               disabled={currentPage === totalPages}
               onClick={() => goToPage(currentPage + 1)}
               className="px-4 py-2 border border-stone-200 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"

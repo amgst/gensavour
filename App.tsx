@@ -8,6 +8,7 @@ import AdminHome from './components/AdminHome';
 import OrderCheckout from './components/OrderCheckout';
 import { MenuItem, Category, CartItem } from './types';
 import { INITIAL_MENU, SITE_INFO } from './constants';
+import { menuService } from './services/menuService';
 
 const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
   const [activeTab, setActiveTab] = useState<Category>(Category.ENTREES);
@@ -407,16 +408,20 @@ const App: React.FC = () => {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   useEffect(() => {
-    const savedMenu = localStorage.getItem('gensavor_menu');
+    const fetchMenu = async () => {
+      try {
+        const remoteMenu = await menuService.initializeMenu();
+        setMenu(remoteMenu);
+      } catch (error) {
+        console.error("Failed to load menu", error);
+        // Fallback or error handling
+      }
+    };
+
+    fetchMenu();
+
     const savedCart = sessionStorage.getItem('gensavor_cart');
     const authStatus = sessionStorage.getItem('gensavor_admin_auth');
-
-    if (savedMenu) {
-      setMenu(JSON.parse(savedMenu));
-    } else {
-      setMenu(INITIAL_MENU);
-      localStorage.setItem('gensavor_menu', JSON.stringify(INITIAL_MENU));
-    }
 
     if (savedCart) {
       setCart(JSON.parse(savedCart));
@@ -431,9 +436,9 @@ const App: React.FC = () => {
     sessionStorage.setItem('gensavor_cart', JSON.stringify(cart));
   }, [cart]);
 
-  const handleUpdateMenu = (updatedMenu: MenuItem[]) => {
+  const handleUpdateMenu = async (updatedMenu: MenuItem[]) => {
     setMenu(updatedMenu);
-    localStorage.setItem('gensavor_menu', JSON.stringify(updatedMenu));
+    await menuService.saveMenu(updatedMenu);
   };
 
   const handleAddToCart = (item: MenuItem) => {
