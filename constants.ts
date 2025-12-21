@@ -68,6 +68,126 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 3.95,
     category: Category.BEVERAGES,
     image: 'https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '9',
+    name: 'Sambosa',
+    description: 'Crispy fried pastries filled with spiced potatoes and peas.',
+    price: 7.95,
+    category: Category.APPETIZERS,
+    image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?q=80&w=1974&auto=format&fit=crop'
+  },
+  {
+    id: '10',
+    name: 'Pakawra',
+    description: 'Batter-fried potato slices served with chutney.',
+    price: 8.95,
+    category: Category.APPETIZERS,
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '11',
+    name: 'Hummus with Naan',
+    description: 'Creamy blended chickpeas with tahini, olive oil, and garlic, served with warm naan.',
+    price: 9.95,
+    category: Category.APPETIZERS,
+    image: 'https://images.unsplash.com/photo-1577906096429-f73c2c312435?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '12',
+    name: 'Aushak',
+    description: 'Leek-filled dumplings topped with meat sauce and yogurt.',
+    price: 13.95,
+    category: Category.APPETIZERS,
+    image: 'https://images.unsplash.com/photo-1590595906931-81f04f0ccebb?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '13',
+    name: 'Qabeli Uzbaki',
+    description: 'Uzbek-style pilaf with tender lamb, carrots, and raisins.',
+    price: 25.95,
+    category: Category.ENTREES,
+    image: 'https://images.unsplash.com/photo-1594977465942-5f68c78c253d?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '14',
+    name: 'Chicken Kebab',
+    description: 'Marinated chicken breast skewers grilled to perfection.',
+    price: 19.95,
+    category: Category.ENTREES,
+    image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?q=80&w=2069&auto=format&fit=crop'
+  },
+  {
+    id: '15',
+    name: 'Chapli Kebab',
+    description: 'Spicy minced beef patties fried and served with naan.',
+    price: 18.95,
+    category: Category.ENTREES,
+    image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '16',
+    name: 'Sabzi Chalow',
+    description: 'Spinach stew served with white rice.',
+    price: 17.95,
+    category: Category.VEGETARIAN,
+    image: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?q=80&w=1935&auto=format&fit=crop'
+  },
+  {
+    id: '17',
+    name: 'Bamia',
+    description: 'Okra stew cooked with tomatoes and spices.',
+    price: 16.95,
+    category: Category.VEGETARIAN,
+    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '18',
+    name: 'Daal Chalow',
+    description: 'Lentil stew served with white rice and salad.',
+    price: 15.95,
+    category: Category.VEGETARIAN,
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    id: '19',
+    name: 'Baklava',
+    description: 'Layers of filo pastry filled with chopped nuts and sweetened with honey.',
+    price: 6.95,
+    category: Category.DESSERTS,
+    image: 'https://images.unsplash.com/photo-1519676867240-f03562e64548?q=80&w=1974&auto=format&fit=crop'
+  },
+  {
+    id: '20',
+    name: 'Sheer Yakh',
+    description: 'Afghan ice cream flavored with rosewater and cardamom.',
+    price: 7.95,
+    category: Category.DESSERTS,
+    image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=2788&auto=format&fit=crop'
+  },
+  {
+    id: '21',
+    name: 'Jalaibi',
+    description: 'Deep-fried batter soaked in sugar syrup.',
+    price: 5.95,
+    category: Category.DESSERTS,
+    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1971&auto=format&fit=crop'
+  },
+  {
+    id: '22',
+    name: 'Mango Lassi',
+    description: 'Creamy mango yogurt drink.',
+    price: 5.50,
+    category: Category.BEVERAGES,
+    image: 'https://images.unsplash.com/photo-1543362187-57351ad1d198?q=80&w=1974&auto=format&fit=crop'
+  },
+  {
+    id: '23',
+    name: 'Black Tea',
+    description: 'Traditional brewed black tea.',
+    price: 2.95,
+    category: Category.BEVERAGES,
+    image: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?q=80&w=1974&auto=format&fit=crop'
   }
 ];
 
