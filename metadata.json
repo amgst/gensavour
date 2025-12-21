@@ -1,0 +1,8 @@
+
+{
+  "name": "GenSavor AI Cuisine",
+  "description": "An elegant, modern intelligence-driven restaurant website featuring a full menu, online presence, and an AI-powered administrative dashboard for culinary management.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
