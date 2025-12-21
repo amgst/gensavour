@@ -1,5 +1,6 @@
 
-import { Category, MenuItem } from './types';
+
+import { MenuItem, CATEGORIES } from './types';
 
 export const INITIAL_MENU: MenuItem[] = [
   {
@@ -7,7 +8,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Mantu',
     description: 'Traditional steamed dumplings filled with spiced ground beef and onions, topped with split pea tomato sauce and garlic yogurt.',
     price: 12.95,
-    category: Category.APPETIZERS,
+    category: CATEGORIES.APPETIZERS,
     image: 'https://images.unsplash.com/photo-1534422298391-e4f8c170db76?q=80&w=2070&auto=format&fit=crop',
     isPopular: true
   },
@@ -16,7 +17,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Bolani',
     description: 'Pan-fried flatbread stuffed with leeks and potatoes, served with yogurt dipping sauce.',
     price: 9.95,
-    category: Category.APPETIZERS,
+    category: CATEGORIES.APPETIZERS,
     image: 'https://images.unsplash.com/photo-1608613304899-ea8098577e38?q=80&w=1974&auto=format&fit=crop'
   },
   {
@@ -24,7 +25,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Kabuli Palow',
     description: 'Our signature national dish. Tender lamb shank buried under seasoned rice topped with caramelized carrots and raisins.',
     price: 24.95,
-    category: Category.ENTREES,
+    category: CATEGORIES.ENTREES,
     image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1971&auto=format&fit=crop',
     isPopular: true
   },
@@ -33,7 +34,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Lamb Chops',
     description: 'Succulent lamb chops marinated in signature spices and charbroiled to perfection.',
     price: 28.95,
-    category: Category.ENTREES,
+    category: CATEGORIES.ENTREES,
     image: 'https://images.unsplash.com/photo-1602491673980-73aa38de027a?q=80&w=1970&auto=format&fit=crop',
     isPopular: true
   },
@@ -42,7 +43,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Borani Banjan',
     description: 'Sauteed eggplant topped with a zesty tomato sauce and garlic yogurt.',
     price: 18.95,
-    category: Category.VEGETARIAN,
+    category: CATEGORIES.VEGETARIAN,
     image: 'https://images.unsplash.com/photo-1541518763669-27fef04b14ea?q=80&w=1933&auto=format&fit=crop'
   },
   {
@@ -50,7 +51,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Firnee',
     description: 'Traditional milk pudding flavored with rosewater, cardamom, and garnished with pistachios.',
     price: 7.95,
-    category: Category.DESSERTS,
+    category: CATEGORIES.DESSERTS,
     image: 'https://images.unsplash.com/photo-1579954115545-a95591f28be0?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -58,7 +59,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Afghan Dogh',
     description: 'Refreshing homemade yogurt drink mixed with diced cucumbers and dried mint.',
     price: 4.50,
-    category: Category.BEVERAGES,
+    category: CATEGORIES.BEVERAGES,
     image: 'https://images.unsplash.com/photo-1541658016709-82535e94bc69?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -66,7 +67,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Green Tea with Cardamom',
     description: 'Traditional Afghan tea infused with aromatic cardamom pods.',
     price: 3.95,
-    category: Category.BEVERAGES,
+    category: CATEGORIES.BEVERAGES,
     image: 'https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -74,7 +75,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Sambosa',
     description: 'Crispy fried pastries filled with spiced potatoes and peas.',
     price: 7.95,
-    category: Category.APPETIZERS,
+    category: CATEGORIES.APPETIZERS,
     image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?q=80&w=1974&auto=format&fit=crop'
   },
   {
@@ -82,7 +83,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Pakawra',
     description: 'Batter-fried potato slices served with chutney.',
     price: 8.95,
-    category: Category.APPETIZERS,
+    category: CATEGORIES.APPETIZERS,
     image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -90,7 +91,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Hummus with Naan',
     description: 'Creamy blended chickpeas with tahini, olive oil, and garlic, served with warm naan.',
     price: 9.95,
-    category: Category.APPETIZERS,
+    category: CATEGORIES.APPETIZERS,
     image: 'https://images.unsplash.com/photo-1577906096429-f73c2c312435?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -98,7 +99,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Aushak',
     description: 'Leek-filled dumplings topped with meat sauce and yogurt.',
     price: 13.95,
-    category: Category.APPETIZERS,
+    category: CATEGORIES.APPETIZERS,
     image: 'https://images.unsplash.com/photo-1590595906931-81f04f0ccebb?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -106,7 +107,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Qabeli Uzbaki',
     description: 'Uzbek-style pilaf with tender lamb, carrots, and raisins.',
     price: 25.95,
-    category: Category.ENTREES,
+    category: CATEGORIES.ENTREES,
     image: 'https://images.unsplash.com/photo-1594977465942-5f68c78c253d?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -114,7 +115,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Chicken Kebab',
     description: 'Marinated chicken breast skewers grilled to perfection.',
     price: 19.95,
-    category: Category.ENTREES,
+    category: CATEGORIES.ENTREES,
     image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?q=80&w=2069&auto=format&fit=crop'
   },
   {
@@ -122,7 +123,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Chapli Kebab',
     description: 'Spicy minced beef patties fried and served with naan.',
     price: 18.95,
-    category: Category.ENTREES,
+    category: CATEGORIES.ENTREES,
     image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -130,7 +131,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Sabzi Chalow',
     description: 'Spinach stew served with white rice.',
     price: 17.95,
-    category: Category.VEGETARIAN,
+    category: CATEGORIES.VEGETARIAN,
     image: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?q=80&w=1935&auto=format&fit=crop'
   },
   {
@@ -138,7 +139,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Bamia',
     description: 'Okra stew cooked with tomatoes and spices.',
     price: 16.95,
-    category: Category.VEGETARIAN,
+    category: CATEGORIES.VEGETARIAN,
     image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -146,7 +147,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Daal Chalow',
     description: 'Lentil stew served with white rice and salad.',
     price: 15.95,
-    category: Category.VEGETARIAN,
+    category: CATEGORIES.VEGETARIAN,
     image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=2070&auto=format&fit=crop'
   },
   {
@@ -154,7 +155,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Baklava',
     description: 'Layers of filo pastry filled with chopped nuts and sweetened with honey.',
     price: 6.95,
-    category: Category.DESSERTS,
+    category: CATEGORIES.DESSERTS,
     image: 'https://images.unsplash.com/photo-1519676867240-f03562e64548?q=80&w=1974&auto=format&fit=crop'
   },
   {
@@ -162,7 +163,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Sheer Yakh',
     description: 'Afghan ice cream flavored with rosewater and cardamom.',
     price: 7.95,
-    category: Category.DESSERTS,
+    category: CATEGORIES.DESSERTS,
     image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=2788&auto=format&fit=crop'
   },
   {
@@ -170,7 +171,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Jalaibi',
     description: 'Deep-fried batter soaked in sugar syrup.',
     price: 5.95,
-    category: Category.DESSERTS,
+    category: CATEGORIES.DESSERTS,
     image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1971&auto=format&fit=crop'
   },
   {
@@ -178,7 +179,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Mango Lassi',
     description: 'Creamy mango yogurt drink.',
     price: 5.50,
-    category: Category.BEVERAGES,
+    category: CATEGORIES.BEVERAGES,
     image: 'https://images.unsplash.com/photo-1543362187-57351ad1d198?q=80&w=1974&auto=format&fit=crop'
   },
   {
@@ -186,7 +187,7 @@ export const INITIAL_MENU: MenuItem[] = [
     name: 'Black Tea',
     description: 'Traditional brewed black tea.',
     price: 2.95,
-    category: Category.BEVERAGES,
+    category: CATEGORIES.BEVERAGES,
     image: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?q=80&w=1974&auto=format&fit=crop'
   }
 ];

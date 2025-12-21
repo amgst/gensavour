@@ -1,11 +1,13 @@
 
-export enum Category {
-  APPETIZERS = 'Appetizers',
-  ENTREES = 'Entrees',
-  VEGETARIAN = 'Vegetarian',
-  DESSERTS = 'Desserts',
-  BEVERAGES = 'Beverages'
-}
+export type Category = string;
+
+export const CATEGORIES = {
+  APPETIZERS: 'Appetizers',
+  ENTREES: 'Entrees',
+  VEGETARIAN: 'Vegetarian',
+  DESSERTS: 'Desserts',
+  BEVERAGES: 'Beverages'
+} as const;
 
 export interface MenuItem {
   id: string;
