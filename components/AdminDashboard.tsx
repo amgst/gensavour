@@ -278,25 +278,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
         >
           + Add New Item
         </button>
-        <button
-          onClick={async () => {
-            if (window.confirm("This will overwrite your current database with the default menu. Are you sure?")) {
-              try {
-                const { menuService } = await import('../services/menuService');
-                const { INITIAL_MENU } = await import('../constants');
-                await menuService.saveMenu(INITIAL_MENU);
-                alert("Menu reset to defaults successfully!");
-                window.location.reload();
-              } catch (e) {
-                alert("Error resetting menu. Check console for details. Ensure Firestore rules allow writes.");
-                console.error(e);
-              }
-            }
-          }}
-          className="ml-4 bg-stone-200 text-stone-700 px-6 py-2 rounded-lg hover:bg-stone-300 shadow-md transition-all whitespace-nowrap active:scale-[0.98] font-bold text-xs uppercase tracking-widest"
-        >
-          ↻ Reset DB
-        </button>
+
       </div>
 
       {/* Filter Bar */}
