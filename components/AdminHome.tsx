@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MenuItem, Category } from '../types';
+import { MenuItem, CATEGORIES } from '../types';
 
 interface AdminHomeProps {
   menu: MenuItem[];
@@ -12,7 +12,7 @@ const AdminHome: React.FC<AdminHomeProps> = ({ menu }) => {
   const stats = {
     total: menu.length,
     popular: menu.filter(m => m.isPopular).length,
-    categories: Object.values(Category).length,
+    categories: Object.values(CATEGORIES).length,
   };
 
   return (

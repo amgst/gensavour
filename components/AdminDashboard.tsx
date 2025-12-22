@@ -25,7 +25,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Derive distinct categories from menu items + defaults
+  const distinctCategories = useMemo(() => {
+    const fromMenu = new Set(menuItems.map(i => i.category));
+    Object.values(CATEGORIES).forEach(c => fromMenu.add(c));
+    return Array.from(fromMenu).sort();
+  }, [menuItems]);
 
   // Selection State
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -313,7 +321,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
               className="w-full sm:w-auto border border-stone-200 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none bg-stone-50 transition-all cursor-pointer"
             >
               <option value="All">All Categories ({searchMatchedItems.length})</option>
-              {Object.values(CATEGORIES).map(cat => (
+              {distinctCategories.map(cat => (
                 <option key={cat} value={cat}>
                   {cat} ({categoryCounts[cat] || 0})
                 </option>
@@ -357,16 +365,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                   {touched.name && errors.name && <p className="text-[10px] text-red-500 font-bold uppercase tracking-wider mt-1">{errors.name}</p>}
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-1">Category</label>
-                  <select
-                    value={editingItem.category}
-                    onChange={e => handleInputChange('category', e.target.value as Category)}
-                    className="w-full border border-stone-200 bg-stone-50 rounded-xl px-4 py-3 focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-200 shadow-sm cursor-pointer"
-                  >
-                    {Object.values(CATEGORIES).map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest">Category</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAddingCategory(!isAddingCategory);
+                        if (!isAddingCategory) handleInputChange('category', '');
+                        else handleInputChange('category', distinctCategories[0] || 'Entrees');
+                      }}
+                      className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider hover:underline"
+                    >
+                      {isAddingCategory ? 'Select Existing' : '+ Create New'}
+                    </button>
+                  </div>
+
+                  {isAddingCategory ? (
+                    <input
+                      type="text"
+                      value={editingItem.category}
+                      onChange={e => handleInputChange('category', e.target.value)}
+                      placeholder="New Category Name"
+                      className="w-full border border-stone-200 bg-stone-50 rounded-xl px-4 py-3 focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-200 shadow-sm"
+                    />
+                  ) : (
+                    <select
+                      value={editingItem.category}
+                      onChange={e => handleInputChange('category', e.target.value as Category)}
+                      className="w-full border border-stone-200 bg-stone-50 rounded-xl px-4 py-3 focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-200 shadow-sm cursor-pointer"
+                    >
+                      {distinctCategories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
 
@@ -515,7 +547,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                 className="bg-stone-800 border border-stone-700 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1.5 rounded-lg outline-none focus:border-emerald-500 transition-all cursor-pointer"
               >
                 <option value="">Choose...</option>
-                {Object.values(CATEGORIES).map(cat => (
+                {distinctCategories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
