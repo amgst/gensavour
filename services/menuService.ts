@@ -32,13 +32,28 @@ export const menuService = {
             snapshot.forEach(doc => existingIds.add(doc.id));
 
             // 2. Set/Update items
-            menu.forEach((item) => {
+            // We need to process sequentially or Promise.all to handle async compression
+            await Promise.all(menu.map(async (item) => {
                 const docRef = doc(db, MENU_COLLECTION, item.id);
+
+                // Compress image if it's a base64 string
+                let processedImage = item.image;
+                if (item.image && item.image.startsWith('data:image')) {
+                    try {
+                        const { compressImage } = await import('../utils/imageUtils');
+                        processedImage = await compressImage(item.image);
+                    } catch (e) {
+                        console.warn('Image compression failed, trying original', e);
+                    }
+                }
+
                 // Sanitize undefined values
-                const sanitizedItem = JSON.parse(JSON.stringify(item));
+                const itemToSave = { ...item, image: processedImage };
+                const sanitizedItem = JSON.parse(JSON.stringify(itemToSave));
+
                 batch.set(docRef, sanitizedItem);
                 existingIds.delete(item.id);
-            });
+            }));
 
             // 3. Delete removed items
             existingIds.forEach(id => {
