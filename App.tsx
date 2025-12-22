@@ -6,13 +6,18 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminLogin from './components/AdminLogin';
 import AdminHome from './components/AdminHome';
 import OrderCheckout from './components/OrderCheckout';
-import { MenuItem, Category, CartItem } from './types';
+import { MenuItem, Category, CartItem, CATEGORIES } from './types';
 import { INITIAL_MENU, SITE_INFO } from './constants';
 import { menuService } from './services/menuService';
 
 const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
-  const [activeTab, setActiveTab] = useState<Category>(Category.ENTREES);
+  const [activeTab, setActiveTab] = useState<Category>(CATEGORIES.ENTREES);
   const popularItems = menu.filter(item => item.isPopular).slice(0, 3);
+
+  // Derive categories from menu if needed, or use a passed prop. For now, we can extract unique categories from the menu.
+  // Using a Set to get unique categories from the menu, falling back to defaults if empty.
+  const availableCategories = Array.from(new Set(menu.map(item => item.category)));
+  const displayCategories = availableCategories.length > 0 ? availableCategories : Object.values(CATEGORIES);
 
   // Filter menu items for the highlights section (limit to 4 per category for home page)
   const highlightItems = menu.filter(item => item.category === activeTab).slice(0, 4);
@@ -115,7 +120,7 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
             <h2 className="text-3xl md:text-5xl font-bold mb-6 font-serif">Menu Highlights</h2>
 
             <div className="flex overflow-x-auto pb-4 md:pb-0 md:flex-wrap justify-start md:justify-center gap-3 md:gap-4 mt-8 no-scrollbar">
-              {[Category.APPETIZERS, Category.ENTREES, Category.DESSERTS].map((cat) => (
+              {displayCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveTab(cat)}
@@ -269,7 +274,11 @@ interface MenuPageProps {
 }
 
 const MenuPage: React.FC<MenuPageProps> = ({ menu, onAddToCart, cart }) => {
-  const [activeCategory, setActiveCategory] = useState<Category>(Category.ENTREES);
+  const [activeCategory, setActiveCategory] = useState<Category>(CATEGORIES.ENTREES);
+
+  // Derive categories from menu or use default
+  const availableCategories = Array.from(new Set(menu.map(item => item.category)));
+  const displayCategories = availableCategories.length > 0 ? availableCategories : Object.values(CATEGORIES);
 
   const getItemQuantity = (id: string) => {
     return cart.find(i => i.id === id)?.quantity || 0;
@@ -286,7 +295,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ menu, onAddToCart, cart }) => {
         </div>
 
         <div className="flex overflow-x-auto pb-4 md:pb-0 md:flex-wrap justify-start md:justify-center gap-3 md:gap-4 mb-12 md:mb-16 no-scrollbar">
-          {Object.values(Category).map(cat => (
+          {displayCategories.map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}

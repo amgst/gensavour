@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { MenuItem, Category } from '../types';
+import { MenuItem, Category, CATEGORIES } from '../types';
 import { generateDescription, suggestPrice } from '../services/geminiService';
 
 type SortKey = keyof MenuItem;
@@ -270,7 +270,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
         </div>
         <button
           onClick={() => {
-            setEditingItem({ category: Category.ENTREES, price: 0 });
+            setEditingItem({ category: CATEGORIES.ENTREES, price: 0 });
             setErrors({});
             setTouched({});
           }}
@@ -313,7 +313,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
               className="w-full sm:w-auto border border-stone-200 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none bg-stone-50 transition-all cursor-pointer"
             >
               <option value="All">All Categories ({searchMatchedItems.length})</option>
-              {Object.values(Category).map(cat => (
+              {Object.values(CATEGORIES).map(cat => (
                 <option key={cat} value={cat}>
                   {cat} ({categoryCounts[cat] || 0})
                 </option>
@@ -363,7 +363,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                     onChange={e => handleInputChange('category', e.target.value as Category)}
                     className="w-full border border-stone-200 bg-stone-50 rounded-xl px-4 py-3 focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-200 shadow-sm cursor-pointer"
                   >
-                    {Object.values(Category).map(cat => (
+                    {Object.values(CATEGORIES).map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
@@ -515,7 +515,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                 className="bg-stone-800 border border-stone-700 text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1.5 rounded-lg outline-none focus:border-emerald-500 transition-all cursor-pointer"
               >
                 <option value="">Choose...</option>
-                {Object.values(Category).map(cat => (
+                {Object.values(CATEGORIES).map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>

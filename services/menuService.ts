@@ -21,16 +21,29 @@ export const menuService = {
         }
     },
 
-    // Save entire menu to Firestore (overwrite)
+    // Save entire menu to Firestore (overwrite with diffing)
     saveMenu: async (menu: MenuItem[]): Promise<void> => {
         try {
             const batch = writeBatch(db);
 
-            // Note: This is a simplified approach. Ideally we'd sync differences.
-            // For now, we'll overwrite documents based on ID.
+            // 1. Get all existing docs to identify deletions
+            const snapshot = await getDocs(collection(db, MENU_COLLECTION));
+            const existingIds = new Set<string>();
+            snapshot.forEach(doc => existingIds.add(doc.id));
+
+            // 2. Set/Update items
             menu.forEach((item) => {
                 const docRef = doc(db, MENU_COLLECTION, item.id);
-                batch.set(docRef, item);
+                // Sanitize undefined values
+                const sanitizedItem = JSON.parse(JSON.stringify(item));
+                batch.set(docRef, sanitizedItem);
+                existingIds.delete(item.id);
+            });
+
+            // 3. Delete removed items
+            existingIds.forEach(id => {
+                const docRef = doc(db, MENU_COLLECTION, id);
+                batch.delete(docRef);
             });
 
             await batch.commit();
