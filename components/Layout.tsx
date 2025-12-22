@@ -171,7 +171,10 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
           </div>
           <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-stone-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-stone-500">
             <p>© {new Date().getFullYear()} GenSavor Intelligence. All Rights Reserved.</p>
-            <Link to="/admin/login" className="hover:underline opacity-50 hover:opacity-100 transition-opacity">Staff Portal</Link>
+            <div className="flex gap-6">
+              <Link to="/showcase" className="hover:text-emerald-600 transition-colors font-bold">Build a Site Like This</Link>
+              <Link to="/admin/login" className="hover:underline opacity-50 hover:opacity-100 transition-opacity">Staff Portal</Link>
+            </div>
           </div>
         </footer>
       )}

@@ -194,7 +194,7 @@ export const INITIAL_MENU: MenuItem[] = [
 
 export const SITE_INFO = {
   name: 'GENSAVOR',
-  subName: 'Generative Flavor Intelligence',
+  subName: 'Food And More',
   address: '3200 W Victory Blvd, Burbank, CA 91505',
   phone: '(818) 555-0123',
   hours: {

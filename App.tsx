@@ -7,6 +7,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminHome from './components/AdminHome';
 import AdminOrders from './components/AdminOrders';
 import AdminAnalytics from './components/AdminAnalytics';
+import ShowcasePage from './components/ShowcasePage';
 import KitchenDisplay from './components/KitchenDisplay';
 import DispatchDisplay from './components/DispatchDisplay';
 import OrderCheckout from './components/OrderCheckout';
@@ -502,6 +503,7 @@ const App: React.FC = () => {
           <Route path="/checkout" element={<OrderCheckout cart={cart} onClearCart={handleClearCart} onUpdateQuantity={handleUpdateQuantity} />} />
           <Route path="/about" element={<div className="py-24 max-w-4xl mx-auto px-4"><h1 className="text-4xl md:text-5xl font-bold mb-8 font-serif text-center md:text-left">Our Evolution</h1><p className="text-stone-600 text-base md:text-lg leading-relaxed text-center md:text-left">Welcome to GenSavor. Our journey began with a simple vision: to bring the authentic hospitality of our heritage into the modern age. We treat every guest as a data point in our story of excellence. Our kitchen is where tradition meets artificial intelligence, creating a sanctuary for those who appreciate the finer details of high-tech dining.</p></div>} />
           <Route path="/track" element={<OrderTracker />} />
+          <Route path="/showcase" element={<ShowcasePage />} />
 
           <Route
             path="/admin/login"
