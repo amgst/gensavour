@@ -5,7 +5,12 @@ import Layout from './components/Layout';
 import AdminDashboard from './components/AdminDashboard';
 import AdminLogin from './components/AdminLogin';
 import AdminHome from './components/AdminHome';
+import AdminOrders from './components/AdminOrders';
+import AdminAnalytics from './components/AdminAnalytics';
+import KitchenDisplay from './components/KitchenDisplay';
+import DispatchDisplay from './components/DispatchDisplay';
 import OrderCheckout from './components/OrderCheckout';
+import OrderTracker from './components/OrderTracker';
 import { MenuItem, Category, CartItem, CATEGORIES } from './types';
 import { INITIAL_MENU, SITE_INFO } from './constants';
 import { menuService } from './services/menuService';
@@ -446,8 +451,16 @@ const App: React.FC = () => {
   }, [cart]);
 
   const handleUpdateMenu = async (updatedMenu: MenuItem[]) => {
-    setMenu(updatedMenu);
-    await menuService.saveMenu(updatedMenu);
+    console.log("App: handleUpdateMenu called with items:", updatedMenu.length);
+    try {
+      setMenu(updatedMenu);
+      console.log("App: Calling menuService.saveMenu");
+      await menuService.saveMenu(updatedMenu);
+      console.log("App: menuService.saveMenu completed");
+    } catch (e) {
+      console.error("App: Error in handleUpdateMenu", e);
+      alert("Failed to save changes: " + (e instanceof Error ? e.message : String(e)));
+    }
   };
 
   const handleAddToCart = (item: MenuItem) => {
@@ -488,6 +501,7 @@ const App: React.FC = () => {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/checkout" element={<OrderCheckout cart={cart} onClearCart={handleClearCart} onUpdateQuantity={handleUpdateQuantity} />} />
           <Route path="/about" element={<div className="py-24 max-w-4xl mx-auto px-4"><h1 className="text-4xl md:text-5xl font-bold mb-8 font-serif text-center md:text-left">Our Evolution</h1><p className="text-stone-600 text-base md:text-lg leading-relaxed text-center md:text-left">Welcome to GenSavor. Our journey began with a simple vision: to bring the authentic hospitality of our heritage into the modern age. We treat every guest as a data point in our story of excellence. Our kitchen is where tradition meets artificial intelligence, creating a sanctuary for those who appreciate the finer details of high-tech dining.</p></div>} />
+          <Route path="/track" element={<OrderTracker />} />
 
           <Route
             path="/admin/login"
@@ -496,6 +510,22 @@ const App: React.FC = () => {
           <Route
             path="/admin"
             element={isAdminLoggedIn ? <AdminHome menu={menu} /> : <Navigate to="/admin/login" />}
+          />
+          <Route
+            path="/admin/orders"
+            element={isAdminLoggedIn ? <AdminOrders /> : <Navigate to="/admin/login" />}
+          />
+          <Route
+            path="/admin/kitchen"
+            element={isAdminLoggedIn ? <KitchenDisplay /> : <Navigate to="/admin/login" />}
+          />
+          <Route
+            path="/admin/dispatch"
+            element={isAdminLoggedIn ? <DispatchDisplay /> : <Navigate to="/admin/login" />}
+          />
+          <Route
+            path="/admin/analytics"
+            element={isAdminLoggedIn ? <AdminAnalytics /> : <Navigate to="/admin/login" />}
           />
           <Route
             path="/admin/menu"

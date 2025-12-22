@@ -19,6 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Menu', path: '/menu' },
+    { name: 'Track Order', path: '/track' },
     { name: 'Our Evolution', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -32,7 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
               <span className="text-xl md:text-2xl font-bold tracking-widest text-emerald-900 uppercase leading-none">{SITE_INFO.name}</span>
               <span className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-amber-600">{SITE_INFO.subName}</span>
             </Link>
-            
+
             {/* Desktop Nav */}
             <div className="hidden md:flex space-x-8 items-center">
               {isAdminArea && authStatus ? (
@@ -40,7 +41,7 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
                   <Link to="/admin" className="text-stone-700 hover:text-emerald-800 transition-colors text-sm font-semibold uppercase tracking-wider">Dashboard</Link>
                   <Link to="/admin/menu" className="text-stone-700 hover:text-emerald-800 transition-colors text-sm font-semibold uppercase tracking-wider">Control Menu</Link>
                   <Link to="/" className="text-stone-700 hover:text-emerald-800 transition-colors text-sm font-semibold uppercase tracking-wider">View Live Site</Link>
-                  <button 
+                  <button
                     onClick={() => {
                       sessionStorage.removeItem('gensavor_admin_auth');
                       window.location.href = '/';
@@ -55,15 +56,15 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
                   {navLinks.map(link => (
                     <Link key={link.path} to={link.path} className="text-stone-700 hover:text-emerald-800 transition-colors text-sm font-semibold uppercase tracking-wider">{link.name}</Link>
                   ))}
-                  <Link 
-                    to="/admin" 
+                  <Link
+                    to="/admin"
                     className={`text-sm font-bold uppercase tracking-wider transition-colors ${authStatus ? 'text-emerald-700' : 'text-stone-400 hover:text-stone-700'}`}
                   >
                     {authStatus ? 'Dashboard' : 'Admin'}
                   </Link>
 
-                  <Link 
-                    to={orderOnlinePath} 
+                  <Link
+                    to={orderOnlinePath}
                     className="relative px-6 py-2 bg-emerald-800 text-white rounded-full text-sm font-bold uppercase tracking-widest hover:bg-emerald-900 transition-all shadow-md flex items-center gap-2"
                   >
                     Order Online
@@ -79,9 +80,9 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
 
             {/* Mobile Nav Button */}
             <div className="flex md:hidden items-center gap-4">
-               {cartCount > 0 && (
+              {cartCount > 0 && (
                 <Link to="/checkout" className="relative p-2 text-emerald-800">
-                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
                   <span className="absolute top-0 right-0 bg-amber-400 text-emerald-950 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold">
@@ -89,7 +90,7 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
                   </span>
                 </Link>
               )}
-              <button 
+              <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 text-stone-700 focus:outline-none"
               >
@@ -116,7 +117,7 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
                   <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-base font-semibold text-stone-700 uppercase tracking-widest border-b border-stone-100">Dashboard</Link>
                   <Link to="/admin/menu" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-base font-semibold text-stone-700 uppercase tracking-widest border-b border-stone-100">Control Menu</Link>
                   <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-base font-semibold text-stone-700 uppercase tracking-widest">Live Site</Link>
-                  <button 
+                  <button
                     onClick={() => {
                       sessionStorage.removeItem('gensavor_admin_auth');
                       window.location.href = '/';

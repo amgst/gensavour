@@ -26,6 +26,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Derive distinct categories from menu items + defaults
@@ -114,6 +115,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("handleSubmit called", editingItem);
     if (!editingItem) return;
 
     // Final validation check
@@ -122,8 +124,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
       description: validateField('description', editingItem.description),
       price: validateField('price', editingItem.price),
     };
+    console.log("Validation errors:", newErrors);
 
     if (Object.values(newErrors).some(err => err !== undefined)) {
+      console.log("Form has errors, returning");
       setErrors(newErrors);
       setTouched({ name: true, description: true, price: true });
       return;
@@ -141,8 +145,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
       updatedMenu = [...menuItems, newItem];
     }
 
-    await onUpdateMenu(updatedMenu);
-    setEditingItem(null);
+    console.log("Calling onUpdateMenu with", updatedMenu);
+    setIsSaving(true);
+    try {
+      await onUpdateMenu(updatedMenu);
+      console.log("onUpdateMenu completed");
+      setEditingItem(null);
+    } catch (e) {
+      console.error("onUpdateMenu failed", e);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAIDescription = async () => {
@@ -492,10 +505,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                 <button type="button" onClick={() => setEditingItem(null)} className="px-6 py-2 text-stone-500 font-bold uppercase text-xs tracking-widest hover:text-stone-800 transition-colors">Cancel</button>
                 <button
                   type="submit"
-                  disabled={Object.values(errors).some(e => !!e)}
-                  className="px-8 py-3 bg-emerald-800 text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-lg shadow-emerald-900/10 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  disabled={isSaving || Object.values(errors).some(e => !!e)}
+                  className="px-8 py-3 bg-emerald-800 text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-lg shadow-emerald-900/10 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                 >
-                  Save Dish
+                  {isSaving ? (
+                    <>
+                      <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Dish'
+                  )}
                 </button>
               </div>
             </form>

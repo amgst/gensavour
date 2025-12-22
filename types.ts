@@ -32,3 +32,21 @@ export interface SiteSettings {
     weekends: string;
   };
 }
+
+export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
+
+export interface Order {
+  id: string;
+  customerName: string;
+  subtotal: number;
+  tax: number;
+  total: number;
+  status: OrderStatus;
+  items: CartItem[];
+  timestamp: string;
+  type: 'pickup' | 'delivery';
+  address?: string;
+  phone: string;
+  email: string;
+  notes?: string;
+}

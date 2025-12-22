@@ -48,22 +48,91 @@ const AdminHome: React.FC<AdminHomeProps> = ({ menu }) => {
         </div>
       </div>
 
-      <div className="bg-emerald-900 rounded-3xl p-10 text-white flex flex-col md:flex-row items-center gap-10">
-        <div className="flex-1">
-          <h2 className="text-3xl font-bold mb-4 font-serif">Ready to update the menu?</h2>
-          <p className="text-emerald-100 text-lg mb-8 leading-relaxed">
-            Add new seasonal specials, adjust prices, or use Gemini AI to write compelling descriptions that will delight your customers.
-          </p>
-          <button
-            onClick={() => navigate('/admin/menu')}
-            className="bg-amber-400 text-emerald-950 font-bold px-8 py-4 rounded-xl hover:bg-amber-300 transition-all shadow-lg"
-          >
-            Manage Menu Content
-          </button>
-        </div>
-        <div className="w-64 h-64 bg-emerald-800/50 rounded-full flex items-center justify-center text-8xl grayscale opacity-50">
-          🥘
-        </div>
+      <div className="mb-8 mt-12">
+        <h2 className="text-2xl font-bold text-stone-800 font-serif">Quick Actions</h2>
+        <p className="text-stone-500 mt-1">Manage your restaurant operations.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-12">
+        {/* Manage Menu Card */}
+        <button
+          onClick={() => navigate('/admin/menu')}
+          className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 text-left hover:shadow-md hover:border-emerald-200 transition-all group"
+        >
+          <div className="w-12 h-12 bg-emerald-100 text-emerald-800 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            📝
+          </div>
+          <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-emerald-800 transition-colors">Manage Menu</h3>
+          <p className="text-stone-500 text-xs leading-relaxed mb-4">Add items, prices, and descriptions.</p>
+          <div className="flex items-center text-emerald-800 font-bold text-xs uppercase tracking-widest gap-2">
+            <span>Edit Content</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </button>
+
+        {/* View Orders Card */}
+        <button
+          onClick={() => navigate('/admin/orders')}
+          className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 text-left hover:shadow-md hover:border-blue-200 transition-all group"
+        >
+          <div className="w-12 h-12 bg-blue-100 text-blue-800 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            📋
+          </div>
+          <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-blue-800 transition-colors">All Orders</h3>
+          <p className="text-stone-500 text-xs leading-relaxed mb-4">View incoming and past orders.</p>
+          <div className="flex items-center text-blue-800 font-bold text-xs uppercase tracking-widest gap-2">
+            <span>View List</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </button>
+
+        {/* Kitchen View Card */}
+        <button
+          onClick={() => navigate('/admin/kitchen')}
+          className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 text-left hover:shadow-md hover:border-amber-200 transition-all group"
+        >
+          <div className="w-12 h-12 bg-amber-100 text-amber-800 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            👨‍🍳
+          </div>
+          <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-amber-800 transition-colors">Kitchen Display</h3>
+          <p className="text-stone-500 text-xs leading-relaxed mb-4">Grid view for chefs and prep staff.</p>
+          <div className="flex items-center text-amber-800 font-bold text-xs uppercase tracking-widest gap-2">
+            <span>Open KDS</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </button>
+
+        {/* Dispatch View Card */}
+        <button
+          onClick={() => navigate('/admin/dispatch')}
+          className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 text-left hover:shadow-md hover:border-indigo-200 transition-all group"
+        >
+          <div className="w-12 h-12 bg-indigo-100 text-indigo-800 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            🛵
+          </div>
+          <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-indigo-800 transition-colors">Dispatch View</h3>
+          <p className="text-stone-500 text-xs leading-relaxed mb-4">Manage pickups and deliveries.</p>
+          <div className="flex items-center text-indigo-800 font-bold text-xs uppercase tracking-widest gap-2">
+            <span>Open Dashboard</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </button>
+
+        {/* Analytics Card */}
+        <button
+          onClick={() => navigate('/admin/analytics')}
+          className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 text-left hover:shadow-md hover:border-emerald-200 transition-all group lg:col-span-full xl:col-span-1"
+        >
+          <div className="w-12 h-12 bg-stone-100 text-stone-800 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            📈
+          </div>
+          <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-emerald-800 transition-colors">Analytics</h3>
+          <p className="text-stone-500 text-xs leading-relaxed mb-4">Revenue, trends, and popular items.</p>
+          <div className="flex items-center text-emerald-800 font-bold text-xs uppercase tracking-widest gap-2">
+            <span>View Report</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </button>
       </div>
     </div>
   );

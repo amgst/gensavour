@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CartItem } from '../types';
+import { orderService } from '../services/orderService';
 
 interface OrderCheckoutProps {
   cart: CartItem[];
@@ -11,11 +11,13 @@ interface OrderCheckoutProps {
 
 const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpdateQuantity }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderId, setOrderId] = useState<string>('');
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
-    type: 'pickup',
+    type: 'pickup' as 'pickup' | 'delivery',
     address: '',
     notes: ''
   });
@@ -24,11 +26,33 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
   const tax = subtotal * 0.095; // 9.5% tax
   const total = subtotal + tax;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
-    setIsSubmitted(true);
-    onClearCart();
+    setIsSubmitting(true);
+
+    try {
+      const id = await orderService.saveOrder({
+        customerName: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        type: formData.type,
+        address: formData.type === 'delivery' ? formData.address : undefined,
+        notes: formData.notes,
+        items: cart,
+        subtotal,
+        tax,
+        total,
+        status: 'pending',
+        timestamp: new Date().toISOString()
+      });
+      setOrderId(id);
+      setIsSubmitted(true);
+      onClearCart();
+    } catch (error) {
+      alert("Failed to submit order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -40,11 +64,16 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
           </div>
           <h2 className="text-3xl font-bold text-stone-900 mb-4 font-serif">System Updated!</h2>
           <p className="text-stone-600 mb-8 leading-relaxed">
-            Thank you for choosing GenSavor. Our intelligence-driven kitchen has received your request. Your order number is <span className="font-bold text-emerald-800">#GEN-{Math.floor(1000 + Math.random() * 9000)}</span>.
+            Thank you for choosing GenSavor. Our intelligence-driven kitchen has received your request. Your order number is <span className="font-bold text-emerald-800">#{orderId.slice(0, 8).toUpperCase()}</span>.
           </p>
-          <Link to="/" className="inline-block bg-emerald-800 text-white px-8 py-3 rounded-full font-bold hover:bg-emerald-900 transition-all">
-            Return to Home
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to={`/track?id=${orderId}`} className="inline-block bg-white border-2 border-emerald-800 text-emerald-800 px-8 py-3 rounded-full font-bold hover:bg-emerald-50 transition-all uppercase tracking-widest text-sm shadow-lg">
+              Track Status
+            </Link>
+            <Link to="/" className="inline-block bg-emerald-800 text-white px-8 py-3 rounded-full font-bold hover:bg-emerald-900 transition-all uppercase tracking-widest text-sm shadow-lg">
+              Return to Home
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -67,7 +96,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate-fadeIn">
       <h1 className="text-5xl font-bold mb-12 font-serif text-stone-900">Complete Your Order</h1>
-      
+
       <div className="flex flex-col lg:flex-row gap-12">
         {/* Form Section */}
         <div className="flex-grow lg:w-2/3">
@@ -77,35 +106,35 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div>
                   <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Full Name</label>
-                  <input 
-                    required 
-                    type="text" 
+                  <input
+                    required
+                    type="text"
                     value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                     className={inputClasses}
                     placeholder="User Name"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Contact Link (Phone)</label>
-                  <input 
-                    required 
-                    type="tel" 
+                  <input
+                    required
+                    type="tel"
                     value={formData.phone}
-                    onChange={e => setFormData({...formData, phone: e.target.value})}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
                     className={inputClasses}
                     placeholder="(818) 555-0123"
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Email Address</label>
-                <input 
-                  required 
-                  type="email" 
+                <input
+                  required
+                  type="email"
                   value={formData.email}
-                  onChange={e => setFormData({...formData, email: e.target.value})}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
                   className={inputClasses}
                   placeholder="name@nexus.com"
                 />
@@ -114,16 +143,16 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
               <div>
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Fulfillment Mode</label>
                 <div className="flex gap-4">
-                  <button 
+                  <button
                     type="button"
-                    onClick={() => setFormData({...formData, type: 'pickup'})}
+                    onClick={() => setFormData({ ...formData, type: 'pickup' })}
                     className={`flex-1 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all duration-200 shadow-sm ${formData.type === 'pickup' ? 'bg-emerald-800 text-white border-emerald-800' : 'bg-stone-50 text-stone-400 border border-stone-200 hover:bg-stone-100'}`}
                   >
                     Pickup
                   </button>
-                  <button 
+                  <button
                     type="button"
-                    onClick={() => setFormData({...formData, type: 'delivery'})}
+                    onClick={() => setFormData({ ...formData, type: 'delivery' })}
                     className={`flex-1 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all duration-200 shadow-sm ${formData.type === 'delivery' ? 'bg-emerald-800 text-white border-emerald-800' : 'bg-stone-50 text-stone-400 border border-stone-200 hover:bg-stone-100'}`}
                   >
                     Delivery
@@ -134,11 +163,11 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
               {formData.type === 'delivery' && (
                 <div className="animate-slideDown">
                   <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Fulfillment Destination</label>
-                  <textarea 
+                  <textarea
                     required
                     rows={2}
                     value={formData.address}
-                    onChange={e => setFormData({...formData, address: e.target.value})}
+                    onChange={e => setFormData({ ...formData, address: e.target.value })}
                     className={`${inputClasses} resize-none`}
                     placeholder="123 Pamir St, Valley City"
                   />
@@ -147,20 +176,21 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
 
               <div>
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">System Directives (Notes)</label>
-                <textarea 
+                <textarea
                   rows={3}
                   value={formData.notes}
-                  onChange={e => setFormData({...formData, notes: e.target.value})}
+                  onChange={e => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Allergies, door codes, or dietary logic."
                   className={`${inputClasses} resize-none`}
                 />
               </div>
 
-              <button 
-                type="submit" 
-                className="w-full bg-emerald-800 text-white py-5 rounded-2xl text-xl font-bold hover:bg-emerald-900 transition-all shadow-2xl shadow-emerald-900/20 mt-8 active:scale-[0.99] uppercase tracking-widest"
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-emerald-800 text-white py-5 rounded-2xl text-xl font-bold hover:bg-emerald-900 transition-all shadow-2xl shadow-emerald-900/20 mt-8 active:scale-[0.99] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Initialize Order • ${total.toFixed(2)}
+                {isSubmitting ? 'Processing...' : `Initialize Order • $${total.toFixed(2)}`}
               </button>
             </form>
           </div>
@@ -176,7 +206,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
                   <div className="flex-grow">
                     <p className="font-semibold text-base leading-tight text-white">{item.name}</p>
                     <div className="flex items-center gap-3 mt-2">
-                      <button 
+                      <button
                         onClick={() => onUpdateQuantity(item.id, -1)}
                         className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
                       >
@@ -185,7 +215,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
                         </svg>
                       </button>
                       <span className="text-stone-300 font-bold min-w-[1ch] text-center text-sm">{item.quantity}</span>
-                      <button 
+                      <button
                         onClick={() => onUpdateQuantity(item.id, 1)}
                         className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
                       >
@@ -214,7 +244,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
                 <span className="text-amber-400">${total.toFixed(2)}</span>
               </div>
             </div>
-            
+
             <p className="mt-8 text-[9px] text-stone-500 text-center uppercase tracking-[0.2em] font-bold">
               Secure Neural Gateway • 256-bit Encryption
             </p>
