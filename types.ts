@@ -49,4 +49,5 @@ export interface Order {
   phone: string;
   email: string;
   notes?: string;
+  publicId?: string; // Short, user-friendly ID for tracking
 }

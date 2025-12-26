@@ -31,7 +31,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
     setIsSubmitting(true);
 
     try {
-      const id = await orderService.saveOrder({
+      const { id, publicId } = await orderService.saveOrder({
         customerName: formData.name,
         phone: formData.phone,
         email: formData.email,
@@ -45,7 +45,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
         status: 'pending',
         timestamp: new Date().toISOString()
       });
-      setOrderId(id);
+      setOrderId(publicId); // Display the public ID
       setIsSubmitted(true);
       onClearCart();
     } catch (error) {
@@ -64,7 +64,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
           </div>
           <h2 className="text-3xl font-bold text-stone-900 mb-4 font-serif">System Updated!</h2>
           <p className="text-stone-600 mb-8 leading-relaxed">
-            Thank you for choosing GenSavor. Our intelligence-driven kitchen has received your request. Your order number is <span className="font-bold text-emerald-800">#{orderId.slice(0, 8).toUpperCase()}</span>.
+            Thank you for choosing GenSavor. Our intelligence-driven kitchen has received your request. Your order number is <span className="font-bold text-emerald-800">#{orderId}</span>.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to={`/track?id=${orderId}`} className="inline-block bg-white border-2 border-emerald-800 text-emerald-800 px-8 py-3 rounded-full font-bold hover:bg-emerald-50 transition-all uppercase tracking-widest text-sm shadow-lg">
