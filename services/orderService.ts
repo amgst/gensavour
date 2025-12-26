@@ -8,9 +8,18 @@ export const orderService = {
     // Save a new order
     saveOrder: async (orderData: Omit<Order, 'id'>): Promise<string> => {
         try {
+            // Create a clean copy of the data and remove potential large fields like images from items
+            const cleanedItems = orderData.items.map(item => {
+                const { image, ...itemWithoutImage } = item;
+                return itemWithoutImage;
+            });
+
             const docRef = await addDoc(collection(db, ORDERS_COLLECTION), {
                 // Sanitize undefined values for Firestore
-                ...JSON.parse(JSON.stringify(orderData)),
+                ...JSON.parse(JSON.stringify({
+                    ...orderData,
+                    items: cleanedItems
+                })),
                 timestamp: Timestamp.now() // Use server timestamp or convert string to timestamp
             });
             return docRef.id;
