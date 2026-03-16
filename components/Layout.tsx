@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SITE_INFO } from '../constants';
+import { useUser } from '../context/UserContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,10 +10,37 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
+  const { user, logout, loginWithGoogle } = useUser();
   const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const isAdminArea = location.pathname.startsWith('/admin');
   const authStatus = sessionStorage.getItem('gensavor_admin_auth') === 'true';
+
+  const handleUserAction = async () => {
+    if (user) {
+      setIsUserMenuOpen(!isUserMenuOpen);
+    } else {
+      try {
+        await loginWithGoogle();
+      } catch (error) {
+        console.error("Login failed", error);
+      }
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setIsUserMenuOpen(false);
+  };
 
   const orderOnlinePath = cartCount > 0 ? '/checkout' : '/menu';
 
@@ -56,12 +84,52 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
                   {navLinks.map(link => (
                     <Link key={link.path} to={link.path} className="text-stone-700 hover:text-emerald-800 transition-colors text-sm font-semibold uppercase tracking-wider">{link.name}</Link>
                   ))}
-                  <Link
-                    to="/admin"
-                    className={`text-sm font-bold uppercase tracking-wider transition-colors ${authStatus ? 'text-emerald-700' : 'text-stone-400 hover:text-stone-700'}`}
-                  >
-                    {authStatus ? 'Dashboard' : 'Admin'}
-                  </Link>
+                  
+                  {/* User Account */}
+                  <div className="relative">
+                    <button
+                      onClick={handleUserAction}
+                      className="p-2 rounded-full hover:bg-stone-100 transition-colors flex items-center gap-2 group"
+                      title={user ? user.displayName || 'Account' : 'Login'}
+                    >
+                      {user ? (
+                        user.photoURL ? (
+                          <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full border border-stone-200" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                            {user.displayName?.[0] || user.email?.[0].toUpperCase()}
+                          </div>
+                        )
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-stone-100 text-stone-600 flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-800 transition-colors text-xs">
+                          👤
+                        </div>
+                      )}
+                    </button>
+
+                    {/* User Dropdown */}
+                    {isUserMenuOpen && user && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-stone-100 py-2 z-50 animate-fadeIn">
+                        <div className="px-4 py-2 border-b border-stone-50">
+                          <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Account</p>
+                          <p className="text-xs font-bold text-stone-800 truncate">{user.displayName || user.email}</p>
+                        </div>
+                        <Link
+                          to="/track"
+                          className="block px-4 py-2 text-xs text-stone-600 hover:bg-stone-50 hover:text-emerald-800 transition-colors font-semibold"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          My Orders
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors font-semibold"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   <Link
                     to={orderOnlinePath}

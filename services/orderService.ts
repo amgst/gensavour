@@ -153,6 +153,27 @@ export const orderService = {
         }
     },
 
+    // Find orders by User ID
+    getOrdersByUser: async (userId: string): Promise<Order[]> => {
+        try {
+            const q = query(collection(db, ORDERS_COLLECTION), where('userId', '==', userId));
+            const snapshot = await getDocs(q);
+            const orders = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    timestamp: data.timestamp?.toDate ? data.timestamp.toDate().toISOString() : new Date().toISOString()
+                } as Order;
+            });
+            // Sort by timestamp desc (newest first)
+            return orders.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        } catch (error) {
+            console.error("Error finding orders by user:", error);
+            throw error;
+        }
+    },
+
     // Find orders by Phone Number
     getOrdersByPhone: async (phone: string): Promise<Order[]> => {
         try {

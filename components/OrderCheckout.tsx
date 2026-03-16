@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { CartItem } from '../types';
 import { orderService } from '../services/orderService';
+import { useUser } from '../context/UserContext';
 
 interface OrderCheckoutProps {
   cart: CartItem[];
@@ -10,17 +11,30 @@ interface OrderCheckoutProps {
 }
 
 const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpdateQuantity }) => {
+  const { user } = useUser();
+  const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderId, setOrderId] = useState<string>('');
   const [formData, setFormData] = useState({
-    name: '',
+    name: user?.displayName || '',
     phone: '',
-    email: '',
+    email: user?.email || '',
     type: 'pickup' as 'pickup' | 'delivery',
     address: '',
     notes: ''
   });
+
+  // Sync user info if they login/logout while on checkout
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name || user.displayName || '',
+        email: prev.email || user.email || ''
+      }));
+    }
+  }, [user]);
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.095; // 9.5% tax
@@ -32,6 +46,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
 
     try {
       const { id, publicId } = await orderService.saveOrder({
+        userId: user?.uid, // Link order to user account if logged in
         customerName: formData.name,
         phone: formData.phone,
         email: formData.email,

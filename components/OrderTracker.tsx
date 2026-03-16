@@ -1,134 +1,190 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { orderService } from '../services/orderService';
 import { Order } from '../types';
+import { useUser } from '../context/UserContext';
 
 const OrderTracker: React.FC = () => {
-    const location = useLocation();
-    const [searchMode, setSearchMode] = useState<'id' | 'phone'>('id');
-    const [inputId, setInputId] = useState('');
-    const [activeId, setActiveId] = useState('');
+    const { user } = useUser();
+    const [searchId, setSearchId] = useState('');
+    const [activeId, setActiveId] = useState<string | null>(null);
     const [order, setOrder] = useState<Order | null>(null);
     const [foundOrders, setFoundOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [historyIds, setHistoryIds] = useState<string[]>([]);
 
+    // Fetch user orders if logged in
+    useEffect(() => {
+        const fetchUserOrders = async () => {
+            if (user) {
+                setLoading(true);
+                try {
+                    const orders = await orderService.getOrdersByUser(user.uid);
+                    setFoundOrders(orders);
+                } catch (err) {
+                    console.error("Failed to fetch user orders", err);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+        fetchUserOrders();
+    }, [user]);
+
     // Effect to handle subscription whenever activeId changes
-    React.useEffect(() => {
+    useEffect(() => {
         setHistoryIds(orderService.getOrderHistory());
         if (!activeId) return;
 
-        setLoading(true);
-        setError('');
-        setOrder(null);
-        setFoundOrders([]); // Clear search results when viewing an order
-
         const unsubscribe = orderService.subscribeToOrder(activeId, (updatedOrder) => {
-            setLoading(false);
             if (updatedOrder) {
                 setOrder(updatedOrder);
+                setError('');
             } else {
-                setError('Order not found. Please check your ID.');
                 setOrder(null);
+                setError('Order not found. Please check your ID.');
+                setActiveId(null);
             }
         });
 
         return () => unsubscribe();
     }, [activeId]);
 
-    // Check URL params on mount
-    React.useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const idParam = params.get('id');
-        if (idParam) {
-            setInputId(idParam);
-            setActiveId(idParam);
-        }
-    }, [location]);
-
-    const handleTrack = async (e: React.FormEvent) => {
+    const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!searchId.trim()) return;
+
+        setLoading(true);
         setError('');
+        setFoundOrders([]);
 
-        if (!inputId.trim()) return;
-
-        if (searchMode === 'id') {
-            // If searching by ID, just set activeId to trigger subscription
-            setActiveId(inputId.trim());
-        } else {
-            // Search by Phone
-            setLoading(true);
-            setOrder(null);
-            setActiveId('');
-            try {
-                const results = await orderService.getOrdersByPhone(inputId.trim());
-                if (results.length === 0) {
-                    setError('No active orders found for this phone number.');
-                    setFoundOrders([]);
+        try {
+            // Check if it's a phone number or ID
+            if (/^\d{10,}$/.test(searchId.replace(/\D/g, ''))) {
+                const orders = await orderService.getOrdersByPhone(searchId.replace(/\D/g, ''));
+                if (orders.length > 0) {
+                    setFoundOrders(orders);
                 } else {
-                    setFoundOrders(results);
+                    setError('No orders found for this phone number.');
                 }
-            } catch (err) {
-                setError('Failed to search orders. Please try again.');
-            } finally {
-                setLoading(false);
+            } else {
+                setActiveId(searchId.toUpperCase());
             }
+        } catch (err) {
+            setError('Failed to search. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
-
-    const getStatusStep = (status: string) => {
-        const steps = ['pending', 'preparing', 'ready', 'completed'];
-        return steps.indexOf(status);
-    };
-
-    const currentStep = order ? getStatusStep(order.status) : -1;
 
     return (
-        <div className="min-h-screen bg-stone-50 py-24 px-4">
-            <div className="max-w-2xl mx-auto">
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold font-serif mb-4 text-stone-900">Track Your Order</h1>
-                    <p className="text-stone-600">Enter your Order ID or Phone Number to see live updates.</p>
-                </div>
-
-                <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 mb-12 border border-stone-100">
-                    {/* Search Mode Tabs */}
-                    <div className="flex bg-stone-100 p-1 rounded-xl mb-8">
-                        <button
-                            onClick={() => { setSearchMode('id'); setInputId(''); setError(''); setFoundOrders([]); }}
-                            className={`flex-1 py-3 text-sm font-bold uppercase tracking-widest rounded-lg transition-all ${searchMode === 'id' ? 'bg-white text-emerald-900 shadow-sm' : 'text-stone-400 hover:text-stone-600'}`}
-                        >
-                            By Order ID
-                        </button>
-                        <button
-                            onClick={() => { setSearchMode('phone'); setInputId(''); setError(''); setFoundOrders([]); }}
-                            className={`flex-1 py-3 text-sm font-bold uppercase tracking-widest rounded-lg transition-all ${searchMode === 'phone' ? 'bg-white text-emerald-900 shadow-sm' : 'text-stone-400 hover:text-stone-600'}`}
-                        >
-                            By Phone
-                        </button>
+        <div className="max-w-4xl mx-auto px-4 py-12">
+            <div className="bg-white rounded-3xl shadow-xl border border-stone-100 overflow-hidden">
+                <div className="p-8 md:p-12">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-bold text-stone-900 mb-2 font-serif">Track Your Order</h2>
+                        <p className="text-stone-500">Enter your Order ID or phone number to see the status.</p>
                     </div>
 
-                    <form onSubmit={handleTrack} className="flex flex-col md:flex-row gap-4">
-                        <input
-                            type={searchMode === 'phone' ? "tel" : "text"}
-                            value={inputId}
-                            onChange={(e) => setInputId(e.target.value)}
-                            placeholder={searchMode === 'phone' ? "(555) 000-0000" : "Enter Order ID (e.g. 7X2...)"}
-                            className="flex-grow bg-stone-50 border border-stone-200 rounded-xl px-6 py-4 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-mono text-stone-800 uppercase tracking-widest"
-                        />
-                        <button
-                            type="submit"
-                            disabled={loading || !inputId}
-                            className="bg-emerald-800 text-white font-bold px-8 py-4 rounded-xl hover:bg-emerald-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest text-sm shadow-lg shadow-emerald-900/20"
-                        >
-                            {loading ? 'Searching...' : (searchMode === 'phone' ? 'Find Orders' : 'Track')}
-                        </button>
-                    </form>
+                    {!activeId && (
+                        <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 mb-10">
+                            <input
+                                type="text"
+                                value={searchId}
+                                onChange={(e) => setSearchId(e.target.value)}
+                                placeholder="Order ID or Phone Number"
+                                className="flex-grow bg-stone-50 border border-stone-200 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-600 transition-all text-lg"
+                            />
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-emerald-800 text-white font-bold py-4 px-8 rounded-2xl hover:bg-emerald-900 transition-all shadow-lg shadow-emerald-900/10 active:scale-95 disabled:opacity-50"
+                            >
+                                {loading ? 'Searching...' : 'Search'}
+                            </button>
+                        </form>
+                    )}
 
                     {error && (
                         <div className="mt-6 p-4 bg-red-50 text-red-600 rounded-xl text-center font-medium border border-red-100">
                             {error}
+                        </div>
+                    )}
+
+                    {/* Active Order Details */}
+                    {activeId && order && (
+                        <div className="space-y-8 animate-fadeIn">
+                            <div className="flex justify-between items-center border-b border-stone-100 pb-6">
+                                <div>
+                                    <h3 className="text-sm font-bold text-stone-400 uppercase tracking-widest mb-1">Order ID</h3>
+                                    <p className="text-xl font-bold text-stone-800 font-mono">#{activeId}</p>
+                                </div>
+                                <div className="text-right">
+                                    <button
+                                        onClick={() => {
+                                            setActiveId(null);
+                                            setOrder(null);
+                                        }}
+                                        className="text-emerald-800 font-bold text-sm hover:underline"
+                                    >
+                                        ← Search Another
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Status Stepper */}
+                            <div className="grid grid-cols-4 gap-2 relative">
+                                <div className="absolute top-1/2 left-0 w-full h-1 bg-stone-100 -translate-y-1/2 -z-10"></div>
+                                {['pending', 'preparing', 'ready', 'completed'].map((status, idx) => {
+                                    const isActive = order.status === status;
+                                    const isDone = ['pending', 'preparing', 'ready', 'completed'].indexOf(order.status) >= idx;
+
+                                    return (
+                                        <div key={status} className="flex flex-col items-center gap-4">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm transition-all duration-500 ${
+                                                isActive ? 'bg-emerald-600 text-white scale-110 ring-8 ring-emerald-50' : 
+                                                isDone ? 'bg-emerald-200 text-emerald-800' : 'bg-stone-50 text-stone-300'
+                                            }`}>
+                                                {status === 'pending' && '📝'}
+                                                {status === 'preparing' && '👨‍🍳'}
+                                                {status === 'ready' && '🛍️'}
+                                                {status === 'completed' && '✅'}
+                                            </div>
+                                            <span className={`text-[10px] font-bold uppercase tracking-widest text-center ${
+                                                isActive ? 'text-emerald-800' : 'text-stone-400'
+                                            }`}>
+                                                {status}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="bg-stone-50 rounded-2xl p-6 space-y-4">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-stone-500">Customer</span>
+                                    <span className="font-bold text-stone-800">{order.customerName}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-stone-500">Placed At</span>
+                                    <span className="font-bold text-stone-800">{new Date(order.timestamp).toLocaleString()}</span>
+                                </div>
+                                <div className="pt-4 border-t border-stone-200">
+                                    <h4 className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-4">Items</h4>
+                                    <div className="space-y-2">
+                                        {order.items.map((item, idx) => (
+                                            <div key={idx} className="flex justify-between text-sm">
+                                                <span className="text-stone-600">{item.quantity}x {item.name}</span>
+                                                <span className="font-medium text-stone-800">${(item.price * item.quantity).toFixed(2)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-4 pt-4 border-t border-stone-200 flex justify-between items-center">
+                                        <span className="font-bold text-stone-800">Total</span>
+                                        <span className="text-lg font-bold text-emerald-800">${order.total.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -137,7 +193,7 @@ const OrderTracker: React.FC = () => {
                         <div className="mt-10 border-t border-stone-100 pt-8">
                             <h3 className="text-xs font-bold text-stone-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                My Recent Orders
+                                Recent Browsing History
                             </h3>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {historyIds.map(id => (
@@ -153,82 +209,46 @@ const OrderTracker: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Found Orders List (Phone Search Results) */}
-                    {foundOrders.length > 0 && (
-                        <div className="mt-8 space-y-4 animate-slideDown">
-                            <h3 className="font-bold text-stone-900 uppercase tracking-widest text-xs border-b border-stone-100 pb-2">Found {foundOrders.length} Orders</h3>
-                            {foundOrders.map(found => (
-                                <div key={found.id} className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-100 hover:border-emerald-200 transition-colors">
-                                    <div>
-                                        <div className="font-bold text-stone-900">
-                                            {found.publicId ? `#${found.publicId}` : 'Order'}
-                                            <span className={`ml-3 text-[10px] px-2 py-1 rounded-full uppercase tracking-wider ${found.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                    found.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                                        'bg-amber-100 text-amber-800'
-                                                }`}>
-                                                {found.status}
-                                            </span>
-                                        </div>
-                                        <div className="text-sm text-stone-500 mt-1">
-                                            {new Date(found.timestamp).toLocaleDateString()} • ${found.total.toFixed(2)}
-                                        </div>
-                                    </div>
+                    {/* Found Orders List (Phone or User Search Results) */}
+                    {!activeId && foundOrders.length > 0 && (
+                        <div className="mt-10 border-t border-stone-100 pt-8 animate-fadeIn">
+                            <h3 className="text-xs font-bold text-stone-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                {user ? 'My Account Orders' : 'Orders Found'}
+                            </h3>
+                            <div className="space-y-3">
+                                {foundOrders.map(o => (
                                     <button
-                                        onClick={() => setActiveId(found.publicId || found.id)}
-                                        className="text-emerald-800 font-bold text-sm hover:underline uppercase tracking-wide"
+                                        key={o.id}
+                                        onClick={() => setActiveId(o.id)}
+                                        className="w-full flex items-center justify-between bg-stone-50 hover:bg-emerald-50 border border-stone-100 hover:border-emerald-200 p-4 rounded-2xl transition-all group"
                                     >
-                                        Track &rarr;
+                                        <div className="text-left">
+                                            <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1 group-hover:text-emerald-600 transition-colors">#{o.id}</p>
+                                            <p className="text-sm font-bold text-stone-800">{new Date(o.timestamp).toLocaleDateString()}</p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
+                                                o.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                            }`}>
+                                                {o.status}
+                                            </span>
+                                            <span className="text-emerald-800 group-hover:translate-x-1 transition-transform">→</span>
+                                        </div>
                                     </button>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                            {!user && (
+                                <button
+                                    onClick={() => setFoundOrders([])}
+                                    className="mt-6 w-full text-center text-xs text-stone-400 hover:text-stone-600 font-bold uppercase tracking-widest"
+                                >
+                                    Clear Search Results
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
-
-                {order && (
-                    <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-stone-100 animate-fadeIn">
-                        <div className="bg-emerald-900 p-8 text-center">
-                            <p className="text-emerald-200 text-xs font-bold uppercase tracking-[0.2em] mb-2">Order Status</p>
-                            <h2 className="text-3xl font-bold text-white mb-1">
-                                {order.status === 'completed' ? 'Enjoy your meal!' :
-                                    order.status === 'ready' ? 'Ready for Pickup!' :
-                                        order.status === 'preparing' ? 'Chef is Cooking...' : 'Order Received'}
-                            </h2>
-                            <p className="text-emerald-200/60 font-mono text-sm mt-4">ID: {order.publicId || order.id}</p>
-                        </div>
-
-                        <div className="p-8 md:p-12">
-                            {/* Stepper */}
-                            <div className="relative flex justify-between mb-12">
-                                <div className="absolute top-1/2 left-0 w-full h-1 bg-stone-100 -translate-y-1/2 z-0"></div>
-                                <div className={`absolute top-1/2 left-0 h-1 bg-emerald-500 -translate-y-1/2 z-0 transition-all duration-1000 ease-out`} style={{ width: `${(currentStep / 3) * 100}%` }}></div>
-
-                                {['Pending', 'Preparing', 'Ready', 'Completed'].map((step, idx) => (
-                                    <div key={step} className="relative z-10 flex flex-col items-center gap-2">
-                                        <div className={`w-4 h-4 rounded-full border-2 transition-all duration-500 ${idx <= currentStep ? 'bg-emerald-500 border-emerald-500 scale-125' : 'bg-white border-stone-200'
-                                            }`}></div>
-                                        <span className={`text-[10px] uppercase font-bold tracking-wider transition-colors duration-500 ${idx <= currentStep ? 'text-emerald-800' : 'text-stone-300'
-                                            }`}>{step}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="space-y-4 border-t border-stone-100 pt-8">
-                                <h3 className="font-bold text-stone-800 uppercase tracking-widest text-xs mb-4">Order Details</h3>
-                                {order.items.map((item, i) => (
-                                    <div key={i} className="flex justify-between items-center text-sm">
-                                        <span className="text-stone-600"><span className="font-bold text-stone-900">{item.quantity}x</span> {item.name}</span>
-                                        <span className="text-stone-400 font-bold">${(item.price * item.quantity).toFixed(2)}</span>
-                                    </div>
-                                ))}
-                                <div className="flex justify-between items-center pt-4 border-t border-stone-100 mt-4 text-lg font-bold text-emerald-900">
-                                    <span>Total</span>
-                                    <span>${order.total.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );
