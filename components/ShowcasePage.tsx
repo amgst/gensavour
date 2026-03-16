@@ -6,7 +6,7 @@ const ShowcasePage: React.FC = () => {
         <div className="bg-white min-h-screen animate-fadeIn font-sans text-stone-900">
             {/* Hero Section */}
             <div className="relative bg-stone-900 text-white py-24 md:py-32 px-4 overflow-hidden">
-                <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2664&auto=format&fit=crop')] bg-cover bg-center"></div>
+                <div className="absolute inset-0 opacity-10 bg-[url('/images/showcase-hero.jpg')] bg-cover bg-center"></div>
                 <div className="max-w-7xl mx-auto relative z-10 text-center">
                     <span className="text-amber-400 font-bold tracking-[0.3em] uppercase text-xs md:text-sm mb-4 block">Restaurant OS v2.0</span>
                     <h1 className="text-5xl md:text-7xl font-bold font-serif mb-8 leading-tight">

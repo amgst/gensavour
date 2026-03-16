@@ -172,5 +172,28 @@ export const orderService = {
             console.error("Error finding orders by phone:", error);
             throw error;
         }
+    },
+
+    // Local History Management
+    saveOrderToHistory: (publicId: string) => {
+        try {
+            const history = JSON.parse(localStorage.getItem('gensavor_order_history') || '[]');
+            if (!history.includes(publicId)) {
+                history.unshift(publicId); // Add to beginning
+                // Keep only last 10 orders
+                const limitedHistory = history.slice(0, 10);
+                localStorage.setItem('gensavor_order_history', JSON.stringify(limitedHistory));
+            }
+        } catch (e) {
+            console.error("Failed to save order to local history", e);
+        }
+    },
+
+    getOrderHistory: (): string[] => {
+        try {
+            return JSON.parse(localStorage.getItem('gensavor_order_history') || '[]');
+        } catch (e) {
+            return [];
+        }
     }
 };

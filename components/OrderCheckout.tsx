@@ -45,6 +45,7 @@ const OrderCheckout: React.FC<OrderCheckoutProps> = ({ cart, onClearCart, onUpda
         status: 'pending',
         timestamp: new Date().toISOString()
       });
+      orderService.saveOrderToHistory(publicId); // Save to local storage for user to see later
       setOrderId(publicId); // Display the public ID
       setIsSubmitted(true);
       onClearCart();

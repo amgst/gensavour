@@ -12,9 +12,11 @@ const OrderTracker: React.FC = () => {
     const [foundOrders, setFoundOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [historyIds, setHistoryIds] = useState<string[]>([]);
 
     // Effect to handle subscription whenever activeId changes
     React.useEffect(() => {
+        setHistoryIds(orderService.getOrderHistory());
         if (!activeId) return;
 
         setLoading(true);
@@ -127,6 +129,27 @@ const OrderTracker: React.FC = () => {
                     {error && (
                         <div className="mt-6 p-4 bg-red-50 text-red-600 rounded-xl text-center font-medium border border-red-100">
                             {error}
+                        </div>
+                    )}
+
+                    {/* Order History (localStorage) */}
+                    {!activeId && !foundOrders.length && historyIds.length > 0 && (
+                        <div className="mt-10 border-t border-stone-100 pt-8">
+                            <h3 className="text-xs font-bold text-stone-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                My Recent Orders
+                            </h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {historyIds.map(id => (
+                                    <button
+                                        key={id}
+                                        onClick={() => setActiveId(id)}
+                                        className="bg-stone-50 hover:bg-emerald-50 border border-stone-100 hover:border-emerald-200 text-stone-600 hover:text-emerald-800 p-3 rounded-xl text-xs font-mono font-bold transition-all text-center uppercase tracking-widest shadow-sm hover:shadow-md"
+                                    >
+                                        #{id}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     )}
 

@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Menu', path: '/menu' },
-    { name: 'Track Order', path: '/track' },
+    { name: 'My Orders', path: '/track' },
     { name: 'Our Evolution', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];

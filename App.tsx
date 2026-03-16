@@ -31,12 +31,12 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
   const highlightItems = menu.filter(item => item.category === activeTab).slice(0, 4);
 
   const galleryItems = [
-    { url: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?q=80&w=2069&auto=format&fit=crop", title: "Authentic Traditions", span: "md:col-span-2 md:row-span-2" },
-    { url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop", title: "Vibrant Greens", span: "md:col-span-1 md:row-span-1" },
-    { url: "https://images.unsplash.com/photo-1547928576-a4a33237ce35?q=80&w=1770&auto=format&fit=crop", title: "Hand-Pulled Dough", span: "md:col-span-1 md:row-span-2" },
-    { url: "https://images.unsplash.com/photo-1606471191009-63994c53433b?q=80&w=1854&auto=format&fit=crop", title: "The Silk Road Spices", span: "md:col-span-1 md:row-span-1" },
-    { url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop", title: "Open Flame Grilling", span: "md:col-span-2 md:row-span-1" },
-    { url: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=1970&auto=format&fit=crop", title: "An Invitation to Stay", span: "md:col-span-1 md:row-span-1" },
+    { url: "/images/gallery-1.jpg", title: "Authentic Traditions", span: "md:col-span-2 md:row-span-2" },
+    { url: "/images/gallery-2.jpg", title: "Vibrant Greens", span: "md:col-span-1 md:row-span-1" },
+    { url: "/images/gallery-3.jpg", title: "Hand-Pulled Dough", span: "md:col-span-1 md:row-span-2" },
+    { url: "/images/gallery-4.jpg", title: "The Silk Road Spices", span: "md:col-span-1 md:row-span-1" },
+    { url: "/images/gallery-5.jpg", title: "Open Flame Grilling", span: "md:col-span-2 md:row-span-1" },
+    { url: "/images/gallery-6.jpg", title: "An Invitation to Stay", span: "md:col-span-1 md:row-span-1" },
   ];
 
   return (
@@ -45,7 +45,7 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1541544741938-0af808871cc0?q=80&w=2069&auto=format&fit=crop"
+            src="/images/hero.jpg"
             alt="Intelligence-Driven Cuisine"
             className="w-full h-full object-cover brightness-50 scale-105 animate-pulse-slow"
           />
@@ -215,8 +215,8 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
             </div>
             <div className="lg:w-1/2 w-full">
               <div className="grid grid-cols-2 gap-4">
-                <img src="https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop" className="rounded-2xl shadow-2xl" alt="Catering 1" />
-                <img src="https://images.unsplash.com/photo-1530103043960-ef38714abb15?q=80&w=2069&auto=format&fit=crop" className="rounded-2xl shadow-2xl mt-8" alt="Catering 2" />
+                <img src="/images/catering-1.jpg" className="rounded-2xl shadow-2xl" alt="Catering 1" />
+                <img src="/images/catering-2.jpg" className="rounded-2xl shadow-2xl mt-8" alt="Catering 2" />
               </div>
             </div>
           </div>
@@ -266,8 +266,8 @@ const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
             </Link>
           </div>
           <div className="flex-1 grid grid-cols-2 gap-4 w-full">
-            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop" className="rounded-2xl shadow-lg mt-8 md:mt-12" alt="Kitchen" />
-            <img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=1970&auto=format&fit=crop" className="rounded-2xl shadow-lg" alt="Interior" />
+            <img src="/images/about-1.jpg" className="rounded-2xl shadow-lg mt-8 md:mt-12" alt="Kitchen" />
+            <img src="/images/about-2.jpg" className="rounded-2xl shadow-lg" alt="Interior" />
           </div>
         </div>
       </section>

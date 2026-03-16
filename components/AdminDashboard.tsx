@@ -27,7 +27,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Derive distinct categories from menu items + defaults
   const distinctCategories = useMemo(() => {
@@ -97,22 +96,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("File is too large. Please select an image under 2MB.");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        handleInputChange('image', reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("handleSubmit called", editingItem);
@@ -133,14 +116,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
       return;
     }
 
+    // Process image path
+    let processedImage = editingItem.image || '/images/default-dish.jpg';
+    if (processedImage && !processedImage.startsWith('/') && !processedImage.startsWith('http') && !processedImage.startsWith('data:')) {
+      processedImage = `/images/${processedImage}`;
+    }
+
     let updatedMenu: MenuItem[];
     if (editingItem.id) {
-      updatedMenu = menuItems.map(item => item.id === editingItem.id ? editingItem as MenuItem : item);
+      updatedMenu = menuItems.map(item => item.id === editingItem.id ? { ...editingItem, image: processedImage } as MenuItem : item);
     } else {
       const newItem = {
         ...editingItem,
         id: Date.now().toString(),
-        image: editingItem.image || 'https://images.unsplash.com/photo-1547928576-a4a33237ce35?q=80&w=1770&auto=format&fit=crop'
+        image: processedImage
       } as MenuItem;
       updatedMenu = [...menuItems, newItem];
     }
@@ -464,27 +453,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ menuItems, onUpdateMenu
                   {touched.price && errors.price && <p className="text-[10px] text-red-500 font-bold uppercase tracking-wider mt-1">{errors.price}</p>}
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Image</label>
+                  <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-2">Image Filename</label>
                   <div className="flex items-center gap-3">
                     <div className="w-14 h-14 rounded-lg bg-stone-100 border border-stone-200 overflow-hidden flex-shrink-0">
                       {editingItem.image ? (
-                        <img src={editingItem.image} alt="Preview" className="w-full h-full object-cover" />
+                        <img
+                          src={editingItem.image.startsWith('/') || editingItem.image.startsWith('http') || editingItem.image.startsWith('data:') ? editingItem.image : `/images/${editingItem.image}`}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-stone-300">🖼️</div>
                       )}
                     </div>
-                    <div className="flex-grow flex gap-2">
-                      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="flex-grow py-2 bg-stone-100 border border-stone-200 rounded-lg text-[10px] font-bold uppercase tracking-wider text-stone-600 hover:bg-stone-200 transition-colors"
-                      >
-                        Upload
-                      </button>
-                      {editingItem.image && (
-                        <button type="button" onClick={() => handleInputChange('image', '')} className="text-[10px] text-red-500 px-2 font-bold uppercase">X</button>
-                      )}
+                    <div className="flex-grow">
+                      <input
+                        type="text"
+                        value={editingItem.image || ''}
+                        onChange={e => handleInputChange('image', e.target.value)}
+                        placeholder="e.g. mantu.jpg"
+                        className="w-full border border-stone-200 bg-stone-50 rounded-xl px-4 py-3 focus:bg-white focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-200 shadow-sm text-sm"
+                      />
+                      <p className="text-[9px] text-stone-400 mt-1 italic">Enter filename (e.g. dish.jpg) or full URL.</p>
                     </div>
                   </div>
                 </div>

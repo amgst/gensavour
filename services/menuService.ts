@@ -68,15 +68,33 @@ export const menuService = {
         }
     },
 
-    // Initialize menu if empty
+    // Initialize menu if empty or migrate old Unsplash URLs to local paths
     initializeMenu: async (): Promise<MenuItem[]> => {
         try {
-            const currentMenu = await menuService.fetchMenu();
+            let currentMenu = await menuService.fetchMenu();
+            
             if (currentMenu.length === 0) {
                 console.log("Initializing menu in Firestore...");
                 await menuService.saveMenu(INITIAL_MENU);
                 return INITIAL_MENU;
             }
+
+            // Check if any items have old Unsplash URLs and migrate them to local paths
+            const hasUnsplashUrls = currentMenu.some(item => item.image && item.image.includes('unsplash.com'));
+            
+            if (hasUnsplashUrls) {
+                console.log("Migrating Unsplash URLs to local /images/ paths...");
+                const migratedMenu = currentMenu.map(item => {
+                    const initialMatch = INITIAL_MENU.find(i => i.name === item.name);
+                    if (initialMatch && item.image && item.image.includes('unsplash.com')) {
+                        return { ...item, image: initialMatch.image };
+                    }
+                    return item;
+                });
+                await menuService.saveMenu(migratedMenu);
+                return migratedMenu;
+            }
+
             return currentMenu;
         } catch (error) {
             console.error("Error initializing menu:", error);
