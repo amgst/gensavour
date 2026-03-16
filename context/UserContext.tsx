@@ -4,8 +4,9 @@ import {
   User, 
   onAuthStateChanged, 
   signOut,
-  GoogleAuthProvider,
-  signInWithPopup
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile
 } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -13,7 +14,8 @@ interface UserContextType {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
+  login: (email: string, pass: string) => Promise<void>;
+  register: (email: string, pass: string, name: string) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -35,13 +37,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await signOut(auth);
   };
 
-  const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+  const login = async (email: string, pass: string) => {
+    await signInWithEmailAndPassword(auth, email, pass);
+  };
+
+  const register = async (email: string, pass: string, name: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(userCredential.user, { displayName: name });
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, logout, loginWithGoogle }}>
+    <UserContext.Provider value={{ user, loading, logout, login, register }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { SITE_INFO } from '../constants';
 import { useUser } from '../context/UserContext';
 
@@ -10,8 +10,9 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
-  const { user, logout, loginWithGoogle } = useUser();
+  const { user, logout } = useUser();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -25,15 +26,11 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
   const isAdminArea = location.pathname.startsWith('/admin');
   const authStatus = sessionStorage.getItem('gensavor_admin_auth') === 'true';
 
-  const handleUserAction = async () => {
+  const handleUserAction = () => {
     if (user) {
       setIsUserMenuOpen(!isUserMenuOpen);
     } else {
-      try {
-        await loginWithGoogle();
-      } catch (error) {
-        console.error("Login failed", error);
-      }
+      navigate('/login', { state: { from: location } });
     }
   };
 
@@ -216,12 +213,14 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
                     <Link key={link.path} to={link.path} onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-base font-semibold text-stone-700 uppercase tracking-widest border-b border-stone-100">{link.name}</Link>
                   ))}
                   {!user && (
-                    <button 
-                      onClick={handleUserAction}
+                    <Link 
+                      to="/login"
+                      state={{ from: location }}
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="px-3 py-4 text-base font-semibold text-emerald-800 uppercase tracking-widest border-b border-stone-100 text-left flex items-center gap-2"
                     >
                       <span>👤 Login / Signup</span>
-                    </button>
+                    </Link>
                   )}
                   <Link to={orderOnlinePath} onClick={() => setIsMobileMenuOpen(false)} className="mx-3 mt-4 px-6 py-4 bg-emerald-800 text-white rounded-2xl text-center font-bold uppercase tracking-widest shadow-xl">
                     Order Online ({cartCount})
