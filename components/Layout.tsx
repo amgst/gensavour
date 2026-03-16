@@ -197,9 +197,32 @@ const Layout: React.FC<LayoutProps> = ({ children, cartCount = 0 }) => {
                 </>
               ) : (
                 <>
+                  {user && (
+                    <div className="px-3 py-4 border-b border-stone-100 flex items-center gap-4">
+                      {user.photoURL ? (
+                        <img src={user.photoURL} alt="Profile" className="w-10 h-10 rounded-full border border-stone-200" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                          {user.displayName?.[0] || user.email?.[0].toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-bold text-stone-800">{user.displayName || user.email}</p>
+                        <button onClick={handleLogout} className="text-xs text-red-600 font-bold uppercase tracking-wider mt-1">Logout</button>
+                      </div>
+                    </div>
+                  )}
                   {navLinks.map(link => (
                     <Link key={link.path} to={link.path} onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 text-base font-semibold text-stone-700 uppercase tracking-widest border-b border-stone-100">{link.name}</Link>
                   ))}
+                  {!user && (
+                    <button 
+                      onClick={handleUserAction}
+                      className="px-3 py-4 text-base font-semibold text-emerald-800 uppercase tracking-widest border-b border-stone-100 text-left flex items-center gap-2"
+                    >
+                      <span>👤 Login / Signup</span>
+                    </button>
+                  )}
                   <Link to={orderOnlinePath} onClick={() => setIsMobileMenuOpen(false)} className="mx-3 mt-4 px-6 py-4 bg-emerald-800 text-white rounded-2xl text-center font-bold uppercase tracking-widest shadow-xl">
                     Order Online ({cartCount})
                   </Link>

@@ -545,6 +545,7 @@ const App: React.FC = () => {
           </Routes>
         </Layout>
       </PrinterProvider>
+      </UserProvider>
     </Router>
   );
 };
