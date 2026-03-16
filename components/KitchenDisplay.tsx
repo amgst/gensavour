@@ -1,23 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { orderService } from '../services/orderService';
 import { Order, OrderStatus } from '../types';
+import { usePrinter } from '../context/PrinterContext';
 
-declare const WebBluetoothReceiptPrinter: any;
 declare const ReceiptPrinterEncoder: any;
 
 const KitchenDisplay: React.FC = () => {
+    const { printer } = usePrinter();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [printer, setPrinter] = useState<any>(null);
     const prevOrdersRef = React.useRef<Order[]>([]);
     const audioRef = React.useRef<HTMLAudioElement | null>(null);
-
-    useEffect(() => {
-        if (typeof WebBluetoothReceiptPrinter !== 'undefined') {
-            const printerInstance = new WebBluetoothReceiptPrinter();
-            setPrinter(printerInstance);
-        }
-    }, []);
 
     useEffect(() => {
         // Initialize Audio

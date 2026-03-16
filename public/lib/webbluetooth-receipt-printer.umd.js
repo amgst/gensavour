@@ -105,6 +105,20 @@
         }
 
         /**
+         * Disconnect from the bluetooth printer
+         * 
+         * @returns {Promise}
+         */
+        disconnect() {
+            return new Promise((resolve) => {
+                if (this.device && this.device.gatt.connected) {
+                    this.device.gatt.disconnect();
+                }
+                resolve();
+            });
+        }
+
+        /**
          * Handle the connection event
          * 
          * @private

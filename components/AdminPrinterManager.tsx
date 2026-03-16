@@ -1,14 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
-
-declare const WebBluetoothReceiptPrinter: any;
+import { usePrinter } from '../context/PrinterContext';
 
 const AdminPrinterManager: React.FC = () => {
-  const [printer, setPrinter] = useState<any>(null);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [connectedDevice, setConnectedDevice] = useState<any>(null);
+  const {
+    printer,
+    connectedDevice,
+    isConnecting,
+    error,
+    setError,
+    handleConnect,
+    handleDisconnect,
+    handleReconnect
+  } = usePrinter();
+
   const [pairedDevices, setPairedDevices] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getPairedDevices = async () => {
@@ -18,69 +24,8 @@ const AdminPrinterManager: React.FC = () => {
       }
     };
 
-    if (typeof WebBluetoothReceiptPrinter !== 'undefined') {
-      const printerInstance = new WebBluetoothReceiptPrinter();
-      printerInstance.addEventListener('connected', (device: any) => {
-        setConnectedDevice(device);
-        setIsConnecting(false);
-        getPairedDevices(); // Refresh the list
-      });
-      printerInstance.addEventListener('disconnected', () => {
-        setConnectedDevice(null);
-        setIsConnecting(false);
-        getPairedDevices(); // Refresh the list
-      });
-      setPrinter(printerInstance);
-    }
-
     getPairedDevices();
-  }, []);
-
-  const handleConnect = async () => {
-    if (!printer) {
-      setError('Printer library not loaded. Please reload the page.');
-      return;
-    }
-
-    setIsConnecting(true);
-    setError(null);
-
-    try {
-      const connected = await printer.connect();
-      if (connected) {
-        setConnectedDevice(printer.device);
-      }
-    } catch (err) {
-      setError(`Failed to connect: ${err.message}`);
-    } finally {
-      setIsConnecting(false);
-    }
-  };
-
-  const handleDisconnect = async () => {
-    if (printer && printer.device) {
-      await printer.disconnect();
-      setConnectedDevice(null);
-    }
-  };
-
-  const handleReconnect = async (device: any) => {
-    if (!printer) {
-      setError('Printer library not loaded. Please reload the page.');
-      return;
-    }
-
-    setIsConnecting(true);
-    setError(null);
-
-    try {
-      await printer.reconnect(device);
-    } catch (err) {
-      setError(`Failed to reconnect: ${err.message}`);
-    } finally {
-      setIsConnecting(false);
-    }
-  };
+  }, [connectedDevice]);
 
   return (
     <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100">

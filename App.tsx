@@ -16,6 +16,7 @@ import OrderTracker from './components/OrderTracker';
 import { MenuItem, Category, CartItem, CATEGORIES } from './types';
 import { INITIAL_MENU, SITE_INFO } from './constants';
 import { menuService } from './services/menuService';
+import { PrinterProvider } from './context/PrinterContext';
 
 const HomePage: React.FC<{ menu: MenuItem[] }> = ({ menu }) => {
   const [activeTab, setActiveTab] = useState<Category>(CATEGORIES.ENTREES);
@@ -496,8 +497,9 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Layout cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}>
-        <Routes>
+      <PrinterProvider>
+        <Layout cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)} authStatus={isAdminLoggedIn}>
+          <Routes>
           <Route path="/" element={<HomePage menu={menu} />} />
           <Route path="/menu" element={<MenuPage menu={menu} cart={cart} onAddToCart={handleAddToCart} />} />
           <Route path="/contact" element={<ContactPage />} />
@@ -538,8 +540,9 @@ const App: React.FC = () => {
             path="/admin/printer"
             element={isAdminLoggedIn ? <AdminPrinterManager /> : <Navigate to="/admin/login" />}
           />
-        </Routes>
-      </Layout>
+          </Routes>
+        </Layout>
+      </PrinterProvider>
     </Router>
   );
 };
