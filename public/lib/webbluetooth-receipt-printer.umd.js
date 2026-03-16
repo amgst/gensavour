@@ -14,7 +14,26 @@
             filters: [
                 {
                     services: ['000018f0-0000-1000-8000-00805f9b34fb']
+                },
+                {
+                    services: ['0000ff00-0000-1000-8000-00805f9b34fb']
+                },
+                {
+                    services: ['49535343-fe7d-41aa-8956-7245aa70821b']
+                },
+                {
+                    services: ['e7810400-410c-4340-9b37-88484e56840d']
+                },
+                {
+                    services: ['00001101-0000-1000-8000-00805f9b34fb']
                 }
+            ],
+            optionalServices: [
+                '000018f0-0000-1000-8000-00805f9b34fb',
+                '0000ff00-0000-1000-8000-00805f9b34fb',
+                '49535343-fe7d-41aa-8956-7245aa70821b',
+                'e7810400-410c-4340-9b37-88484e56840d',
+                '00001101-0000-1000-8000-00805f9b34fb'
             ]
         };
 
@@ -64,12 +83,8 @@
                     return device.gatt.connect();
                 }).then(server => {
                     this.server = server;
-                    return server.getPrimaryService(this.options.filters[0].services[0]);
-                }).then(service => {
-                    this.service = service;
-                    return service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-                }).then(characteristic => {
-                    this.characteristic = characteristic;
+                    return this.findServiceAndCharacteristic(server);
+                }).then(() => {
                     this.handleConnect();
                     resolve();
                 }).catch(error => {
@@ -90,18 +105,36 @@
                 this.device.addEventListener('gattserverdisconnected', e => this.handleDisconnect(e));
                 device.gatt.connect().then(server => {
                     this.server = server;
-                    return server.getPrimaryService(this.options.filters[0].services[0]);
-                }).then(service => {
-                    this.service = service;
-                    return service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-                }).then(characteristic => {
-                    this.characteristic = characteristic;
+                    return this.findServiceAndCharacteristic(server);
+                }).then(() => {
                     this.handleConnect();
                     resolve();
                 }).catch(error => {
                     reject(error);
                 });
             });
+        }
+
+        /**
+         * Find a writable characteristic in the given server
+         * 
+         * @private
+         * @param {BluetoothRemoteGATTServer} server 
+         * @returns {Promise}
+         */
+        async findServiceAndCharacteristic(server) {
+            const services = await server.getPrimaryServices();
+            for (const service of services) {
+                const characteristics = await service.getCharacteristics();
+                for (const characteristic of characteristics) {
+                    if (characteristic.properties.write || characteristic.properties.writeWithoutResponse) {
+                        this.service = service;
+                        this.characteristic = characteristic;
+                        return;
+                    }
+                }
+            }
+            throw new Error('No writable characteristic found');
         }
 
         /**

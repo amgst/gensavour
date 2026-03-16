@@ -50,13 +50,18 @@ export const PrinterProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     setIsConnecting(true);
     setError(null);
+    console.log('Starting Bluetooth connection process...');
 
     try {
-      const connected = await printer.connect();
-      if (connected) {
+      await printer.connect();
+      if (printer.device) {
+        console.log('Connected to device:', printer.device.name);
         setConnectedDevice(printer.device);
+      } else {
+        throw new Error('No device selected or connection failed.');
       }
     } catch (err: any) {
+      console.error('Connection error:', err);
       setError(`Failed to connect: ${err.message}`);
     } finally {
       setIsConnecting(false);
@@ -64,9 +69,14 @@ export const PrinterProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const handleDisconnect = async () => {
-    if (printer && printer.device) {
-      await printer.disconnect();
-      setConnectedDevice(null);
+    if (printer) {
+      console.log('Disconnecting printer...');
+      try {
+        await printer.disconnect();
+        setConnectedDevice(null);
+      } catch (err) {
+        console.error('Disconnect error:', err);
+      }
     }
   };
 
@@ -78,10 +88,18 @@ export const PrinterProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     setIsConnecting(true);
     setError(null);
+    console.log('Reconnecting to device:', device.name);
 
     try {
       await printer.reconnect(device);
+      if (printer.device) {
+        console.log('Reconnected successfully to:', printer.device.name);
+        setConnectedDevice(printer.device);
+      } else {
+        throw new Error('Reconnection failed.');
+      }
     } catch (err: any) {
+      console.error('Reconnection error:', err);
       setError(`Failed to reconnect: ${err.message}`);
     } finally {
       setIsConnecting(false);

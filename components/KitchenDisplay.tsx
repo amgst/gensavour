@@ -6,7 +6,7 @@ import { usePrinter } from '../context/PrinterContext';
 declare const ReceiptPrinterEncoder: any;
 
 const KitchenDisplay: React.FC = () => {
-    const { printer } = usePrinter();
+    const { printer, connectedDevice } = usePrinter();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const prevOrdersRef = React.useRef<Order[]>([]);
@@ -108,7 +108,18 @@ const KitchenDisplay: React.FC = () => {
     return (
         <div className="min-h-screen bg-stone-900 text-white p-6">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-4xl font-bold font-serif text-emerald-400">KITCHEN DISPLAY</h1>
+                <div>
+                  <h1 className="text-4xl font-bold font-serif text-emerald-400">KITCHEN DISPLAY</h1>
+                  {connectedDevice ? (
+                    <p className="text-emerald-500 text-xs uppercase tracking-widest mt-1">
+                      ● Printer Active: {connectedDevice.name}
+                    </p>
+                  ) : (
+                    <p className="text-red-500 text-xs uppercase tracking-widest mt-1">
+                      ○ Printer Disconnected
+                    </p>
+                  )}
+                </div>
                 <div className="text-right">
                     <p className="text-sm text-stone-400 uppercase tracking-widest">Active Tickets</p>
                     <p className="text-3xl font-bold">{orders.length}</p>
