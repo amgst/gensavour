@@ -2,11 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { orderService } from '../services/orderService';
 import { Order, OrderStatus } from '../types';
 
+declare const WebBluetoothReceiptPrinter: any;
+declare const ReceiptPrinterEncoder: any;
+
 const KitchenDisplay: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
+    const [printer, setPrinter] = useState<any>(null);
     const prevOrdersRef = React.useRef<Order[]>([]);
     const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        if (typeof WebBluetoothReceiptPrinter !== 'undefined') {
+            const printerInstance = new WebBluetoothReceiptPrinter();
+            setPrinter(printerInstance);
+        }
+    }, []);
 
     useEffect(() => {
         // Initialize Audio
@@ -35,8 +46,12 @@ const KitchenDisplay: React.FC = () => {
 
             const hasNewPending = currentPending.some(o => !previousPendingIds.includes(o.id));
 
-            if (hasNewPending && audioRef.current) {
-                audioRef.current.play().catch(e => console.log("Audio play failed (interaction needed):", e));
+            if (hasNewPending) {
+                if (audioRef.current) {
+                    audioRef.current.play().catch(e => console.log("Audio play failed (interaction needed):", e));
+                }
+                const newOrders = currentPending.filter(o => !previousPendingIds.includes(o.id));
+                newOrders.forEach(printOrder);
             }
 
             setOrders(kitchenOrders);
@@ -45,7 +60,46 @@ const KitchenDisplay: React.FC = () => {
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [printer]);
+
+    const printOrder = async (order: Order) => {
+        if (!printer || !printer.device) {
+            console.error('Printer not connected. Cannot print order.');
+            return;
+        }
+
+        const encoder = new ReceiptPrinterEncoder({
+            language: 'esc-pos',
+        });
+
+        let data = encoder
+            .initialize()
+            .text('GenSavor AI Cuisine')
+            .newline()
+            .text('================================')
+            .newline()
+            .text(`Order #${order.id.slice(0, 4)}`)
+            .newline()
+            .text(new Date(order.timestamp).toLocaleString())
+            .newline()
+            .text('--------------------------------')
+            .newline();
+
+        order.items.forEach(item => {
+            const itemLine = `${item.quantity}x ${item.name}`;
+            data = data.text(itemLine).newline();
+        });
+
+        if (order.notes) {
+            data = data.newline().text('--------------------------------').newline().text(`Notes: ${order.notes}`).newline();
+        }
+
+        try {
+            await printer.print(data.encode());
+        } catch (error) {
+            console.error('Failed to print:', error);
+        }
+    };
 
     const advanceOrder = async (order: Order) => {
         const newStatus: OrderStatus = order.status === 'pending' ? 'preparing' : 'ready';

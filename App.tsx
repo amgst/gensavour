@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import AdminDashboard from './components/AdminDashboard';
+import AdminPrinterManager from './components/AdminPrinterManager';
 import AdminLogin from './components/AdminLogin';
 import AdminHome from './components/AdminHome';
 import AdminOrders from './components/AdminOrders';
@@ -532,6 +533,10 @@ const App: React.FC = () => {
           <Route
             path="/admin/menu"
             element={isAdminLoggedIn ? <AdminDashboard menuItems={menu} onUpdateMenu={handleUpdateMenu} /> : <Navigate to="/admin/login" />}
+          />
+          <Route
+            path="/admin/printer"
+            element={isAdminLoggedIn ? <AdminPrinterManager /> : <Navigate to="/admin/login" />}
           />
         </Routes>
       </Layout>

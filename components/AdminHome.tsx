@@ -133,6 +133,22 @@ const AdminHome: React.FC<AdminHomeProps> = ({ menu }) => {
             <span className="group-hover:translate-x-1 transition-transform">→</span>
           </div>
         </button>
+
+        {/* Printer Manager Card */}
+        <button
+          onClick={() => navigate('/admin/printer')}
+          className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 text-left hover:shadow-md hover:border-purple-200 transition-all group"
+        >
+          <div className="w-12 h-12 bg-purple-100 text-purple-800 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            🖨️
+          </div>
+          <h3 className="text-lg font-bold text-stone-800 mb-2 group-hover:text-purple-800 transition-colors">Printer Settings</h3>
+          <p className="text-stone-500 text-xs leading-relaxed mb-4">Connect and manage receipt printers.</p>
+          <div className="flex items-center text-purple-800 font-bold text-xs uppercase tracking-widest gap-2">
+            <span>Configure</span>
+            <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </button>
       </div>
     </div>
   );
